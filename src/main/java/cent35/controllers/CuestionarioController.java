@@ -40,6 +40,14 @@ public class CuestionarioController {
         return new ResponseEntity<>(new CuestionarioDTO(cuestionario), HttpStatus.OK);
     }
 
+    @GetMapping("/tamizajes/{idTamizaje}/cuestionario")
+    public ResponseEntity<Object> obtenerPorTamizaje(@PathVariable Long idTamizaje) {
+        Tamizaje tamizaje = tamizajeRepository.findById(idTamizaje).orElse(null);
+        if (tamizaje == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tamizaje no encontrado");
+        if (tamizaje.getCuestionario() == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cuestionario no encontrado");
+        return ResponseEntity.ok(new CuestionarioDTO(tamizaje.getCuestionario()));
+    }
+
     @PostMapping("/tamizajes/{idTamizaje}/cuestionario")
     public ResponseEntity<Object> crearCuestionario(@PathVariable Long idTamizaje, @RequestBody Cuestionario cuestionario) {
 
