@@ -1,6 +1,8 @@
-# Tamizaje · Frontend React
+# Tamizaje · React y Bootstrap
 
-Interfaz en español para la API Spring Boot: resumen, registro y búsqueda de pacientes y personal, creación de fichas con consentimiento, antropometría, tomas de presión (alta, edición y eliminación), cuestionario, resultados FINDRISC e impresión.
+Interfaz en español construida con React 19, Bootstrap 5.3 y React-Bootstrap para la API Spring Boot: resumen, registro y búsqueda de pacientes y personal, creación de fichas con consentimiento, antropometría, tomas de presión (alta, edición y eliminación), cuestionario, resultados FINDRISC e impresión.
+
+El diseño utiliza la grilla adaptable, tarjetas, tablas, formularios, alertas, navegación y ventanas modales de Bootstrap. React-Bootstrap administra el foco y el teclado de los modales; no se carga el JavaScript de Bootstrap por separado. Los estilos de marca se encuentran en `src/styles.css`, después del CSS de Bootstrap.
 
 ## Desarrollo
 

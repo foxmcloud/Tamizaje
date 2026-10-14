@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useId } from "react";
 import {
   Activity,
   Users,
@@ -13,6 +13,13 @@ import {
   Printer,
   X,
 } from "lucide-react";
+import {
+  Modal,
+  Form as BootstrapForm,
+  Badge as BootstrapBadge,
+  InputGroup,
+  Nav,
+} from "react-bootstrap";
 import { request, label, age, questionnaire } from "./api";
 const sections = [
   ["inicio", "Resumen", Activity],
@@ -26,22 +33,37 @@ const sexes = [
   ["O", "Otro"],
 ];
 function Field({ name, label: title, options, ...props }) {
+  const id = useId();
   return (
-    <label className="field">
-      <span>{title}</span>
+    <BootstrapForm.Group
+      className="field col-12 col-md-6"
+      controlId={`${id}-${name}`}
+    >
+      <BootstrapForm.Label>{title}</BootstrapForm.Label>
       {options ? (
-        <select name={name} required {...props}>
+        <BootstrapForm.Select name={name} required {...props}>
           <option value="">Seleccionar…</option>
           {options.map(([value, text]) => (
             <option key={value} value={value}>
               {text}
             </option>
           ))}
-        </select>
+        </BootstrapForm.Select>
       ) : (
-        <input name={name} required {...props} />
+        <BootstrapForm.Control name={name} required {...props} />
       )}
-    </label>
+    </BootstrapForm.Group>
+  );
+}
+function StatCard({ children }) {
+  return (
+    <div className="col-12 col-md-4">
+      <div className="stat card h-100">
+        <div className="card-body d-flex flex-column align-items-start gap-2">
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
 function Form({ children, onSave, submit = "Guardar", disabled = false }) {
@@ -70,23 +92,42 @@ function Form({ children, onSave, submit = "Guardar", disabled = false }) {
         }
       }}
     >
-      <div className="form-grid">{children}</div>
+      <div className="form-grid row g-3">{children}</div>
       {error && (
-        <p role="alert" className="error">
+        <p role="alert" className="alert alert-danger error">
           {error}
         </p>
       )}
-      <button disabled={busy || disabled} className="primary" type="submit">
+      <button
+        disabled={busy || disabled}
+        className="btn btn-primary primary"
+        type="submit"
+      >
         {busy ? "Guardando…" : submit}
       </button>
     </form>
   );
 }
 function Badge({ value }) {
+  const tone =
+    {
+      VERDE: "success",
+      ACEPTADO: "success",
+      EVALUADO: "success",
+      BAJO: "success",
+      ROJO: "danger",
+      ALTO: "danger",
+      AMARILLO: "warning",
+      PENDIENTE: "warning",
+      "EN CURSO": "warning",
+    }[String(value).toUpperCase()] || "secondary";
   return (
-    <span className={`badge ${String(value).toLowerCase()}`}>
+    <BootstrapBadge
+      bg={`${tone}-subtle`}
+      className={`text-${tone}-emphasis status-badge`}
+    >
       {label(value)}
-    </span>
+    </BootstrapBadge>
   );
 }
 function Empty({ text }) {
@@ -99,7 +140,6 @@ function Empty({ text }) {
   );
 }
 export default function App() {
-  const dialogRef = useRef(null);
   const [page, setPage] = useState("inicio"),
     [data, setData] = useState({
       pacientes: [],
@@ -129,34 +169,6 @@ export default function App() {
   useEffect(() => {
     reload();
   }, []);
-  useEffect(() => {
-    if (!modal) return;
-    const previous = document.activeElement;
-    const handle = (e) => {
-      if (e.key === "Escape") setModal(null);
-      if (e.key === "Tab") {
-        const items = [
-          ...dialogRef.current.querySelectorAll(
-            "button:not(:disabled),input:not(:disabled),select:not(:disabled)",
-          ),
-        ];
-        const first = items[0],
-          last = items[items.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last?.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", handle);
-    return () => {
-      document.removeEventListener("keydown", handle);
-      previous?.focus();
-    };
-  }, [modal]);
   async function save(path, values, params = false) {
     await request(path, {
       method: "POST",
@@ -175,7 +187,7 @@ export default function App() {
     JSON.stringify(row).toLowerCase().includes(query.toLowerCase());
   return (
     <div className="app">
-      <aside>
+      <aside className="workspace-sidebar">
         <a
           className="brand"
           href="#"
@@ -192,19 +204,24 @@ export default function App() {
           </span>
         </a>
         <div className="nav-label">ESPACIO DE TRABAJO</div>
-        <nav>
+        <Nav
+          variant="pills"
+          className="workspace-nav"
+          activeKey={page}
+          onSelect={navigate}
+          aria-label="Secciones de Tamizaje"
+        >
           {sections.map(([key, title, Icon]) => (
-            <button
-              key={key}
-              className={page === key ? "active" : ""}
-              onClick={() => navigate(key)}
-            >
-              <Icon size={19} />
-              {title}
-              {key === page && <span className="nav-dot" />}
-            </button>
+            <Nav.Item key={key}>
+              <Nav.Link as="button" eventKey={key}>
+                <Icon size={19} />
+                {title}
+                {key === page && <span className="nav-dot" />}
+              </Nav.Link>
+            </Nav.Item>
           ))}
-        </nav>
+        </Nav>
+
         <div className="sidebar-note">
           <span className="status-dot" /> Atención preventiva
           <p>
@@ -220,8 +237,8 @@ export default function App() {
           </div>
         </div>
       </aside>
-      <main>
-        <header>
+      <main className="workspace-main">
+        <header className="workspace-header">
           <span>
             Centro de salud <span className="divider">/</span>{" "}
             {sections.find((s) => s[0] === page)?.[1]}
@@ -233,7 +250,7 @@ export default function App() {
             }).format(new Date())}
           </time>
         </header>
-        <div className="content">
+        <div className="content container-fluid">
           <div className="page-heading">
             <div>
               <p className="eyebrow">CUIDADO QUE EMPIEZA CON PREVENCIÓN</p>
@@ -254,7 +271,7 @@ export default function App() {
               </p>
             </div>
             <button
-              className="primary"
+              className="btn btn-primary primary"
               onClick={() =>
                 setModal(
                   page === "pacientes"
@@ -274,16 +291,28 @@ export default function App() {
             </button>
           </div>
           {error && (
-            <div className="error" role="alert">
+            <div className="alert alert-danger error" role="alert">
               No se pudo cargar la API: {error}{" "}
-              <button onClick={reload}>Reintentar</button>
+              <button
+                className="btn btn-outline-danger btn-sm ms-2"
+                onClick={reload}
+              >
+                Reintentar
+              </button>
             </div>
           )}
           {notice && (
-            <div className="notice" role="status">
+            <div
+              className="alert alert-success notice d-flex align-items-center gap-2"
+              role="status"
+            >
               <Check size={18} />
               {notice}
-              <button aria-label="Cerrar aviso" onClick={() => setNotice("")}>
+              <button
+                className="btn btn-sm ms-auto"
+                aria-label="Cerrar aviso"
+                onClick={() => setNotice("")}
+              >
                 <X size={16} />
               </button>
             </div>
@@ -298,7 +327,7 @@ export default function App() {
             <>
               {page === "inicio" && (
                 <>
-                  <div className="stats">
+                  <div className="stats row g-3">
                     {[
                       [
                         ClipboardList,
@@ -312,14 +341,14 @@ export default function App() {
                       ],
                       [Stethoscope, "Profesionales", data.enfermeros.length],
                     ].map(([Icon, title, count]) => (
-                      <div className="stat" key={title}>
+                      <StatCard key={title}>
                         <div className="stat-icon">
                           <Icon size={21} />
                         </div>
                         <span>{title}</span>
                         <strong>{loading ? "—" : count}</strong>
                         <small>Registros de la comunidad</small>
-                      </div>
+                      </StatCard>
                     ))}
                   </div>
                   <div className="hero">
@@ -335,7 +364,10 @@ export default function App() {
                         <br />
                         factores de riesgo y orientar el cuidado.
                       </p>
-                      <button onClick={() => setModal("tamizaje")}>
+                      <button
+                        className="btn btn-outline-primary d-inline-flex align-items-center gap-2"
+                        onClick={() => setModal("tamizaje")}
+                      >
                         Iniciar una evaluación <ArrowUpRight size={18} />
                       </button>
                     </div>
@@ -346,8 +378,8 @@ export default function App() {
                   </div>
                 </>
               )}
-              <section className="panel">
-                <div className="panel-head">
+              <section className="panel card">
+                <div className="panel-head card-header">
                   <div>
                     <h2>
                       {page === "inicio"
@@ -363,17 +395,20 @@ export default function App() {
                     </p>
                   </div>
                   <div className="tools">
-                    <label className="search">
-                      <Search size={17} />
-                      <input
+                    <InputGroup size="sm" className="search">
+                      <InputGroup.Text>
+                        <Search size={17} />
+                      </InputGroup.Text>
+                      <BootstrapForm.Control
                         aria-label="Buscar registros"
                         placeholder="Buscar registros…"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                       />
-                    </label>
+                    </InputGroup>
+
                     <button
-                      className="icon-button"
+                      className="btn btn-outline-secondary icon-button"
                       aria-label="Actualizar registros"
                       onClick={reload}
                     >
@@ -386,7 +421,7 @@ export default function App() {
                     Cargando registros…
                   </p>
                 ) : (
-                  <div className="table-wrap">
+                  <div className="table-wrap table-responsive">
                     {(page === "pacientes"
                       ? data.pacientes
                       : page === "equipo"
@@ -401,7 +436,7 @@ export default function App() {
                         }
                       />
                     ) : (
-                      <table>
+                      <table className="table table-hover align-middle mb-0">
                         <thead>
                           <tr>
                             {(page === "pacientes"
@@ -465,7 +500,9 @@ export default function App() {
                                   <>
                                     <td>
                                       <strong>{row.id_registro}</strong>
-                                      <small>Ficha #{row.id}</small>
+                                      <small className="d-block text-body-secondary">
+                                        Ficha #{row.id}
+                                      </small>
                                     </td>
                                     <td>
                                       {row.timestamp
@@ -481,7 +518,7 @@ export default function App() {
                                     </td>
                                     <td>
                                       <button
-                                        className="text-button"
+                                        className="btn btn-link text-button"
                                         onClick={() => {
                                           setPage("tamizajes");
                                           setSelected(row);
@@ -508,156 +545,146 @@ export default function App() {
           </footer>
         </div>
       </main>
-      {modal && (
-        <div
-          className="modal-backdrop"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setModal(null);
-          }}
-        >
-          <section
-            ref={dialogRef}
-            className="modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-          >
-            <div className="panel-head">
-              <h2 id="modal-title">
-                {modal === "paciente"
-                  ? "Registrar paciente"
-                  : modal === "enfermero"
-                    ? "Agregar profesional"
-                    : "Iniciar tamizaje"}
-              </h2>
-              <button
-                autoFocus
-                className="icon-button"
-                aria-label="Cerrar formulario"
-                onClick={() => setModal(null)}
-              >
-                <X />
-              </button>
-            </div>
-            {modal === "paciente" ? (
+      <Modal
+        show={Boolean(modal)}
+        onHide={() => setModal(null)}
+        centered
+        scrollable
+        size="lg"
+        className="registration-modal"
+        dialogClassName="registration-dialog"
+        aria-labelledby="modal-title"
+      >
+        <Modal.Header closeButton closeLabel="Cerrar formulario">
+          <Modal.Title as="h2" id="modal-title">
+            {modal === "paciente"
+              ? "Registrar paciente"
+              : modal === "enfermero"
+                ? "Agregar profesional"
+                : "Iniciar tamizaje"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {modal === "paciente" ? (
+            <Form
+              onSave={(v) => {
+                const years = age(v.fecha_nacimiento);
+                if (years < 14 || years > 120)
+                  throw new Error("La edad debe estar entre 14 y 120 años.");
+                return save("/pacientes", v, true);
+              }}
+            >
+              <Field
+                name="fecha_nacimiento"
+                label="Fecha de nacimiento"
+                type="date"
+              />
+              <Field name="sexo" label="Sexo" options={sexes} />
+            </Form>
+          ) : modal === "enfermero" ? (
+            <Form
+              onSave={(v) =>
+                save(
+                  "/enfermeros",
+                  Object.fromEntries(
+                    Object.entries(v).map(([k, val]) => [k, val.trim()]),
+                  ),
+                  true,
+                )
+              }
+            >
+              <Field name="nombre" label="Nombre" maxLength={80} />
+              <Field name="apellido" label="Apellido" maxLength={80} />
+              <Field
+                name="rol"
+                label="Rol"
+                options={["ENFERMERO", "SUPERVISOR"].map((x) => [x, label(x)])}
+              />
+              <Field
+                name="turno"
+                label="Turno"
+                options={["MAÑANA", "TARDE", "VESPERTINO"].map((x) => [
+                  x,
+                  label(x),
+                ])}
+              />
+            </Form>
+          ) : (
+            <>
+              <p className="muted">
+                Seleccioná un paciente y al personal responsable. Registrá al
+                paciente y al equipo antes de comenzar.
+              </p>
               <Form
-                onSave={(v) => {
-                  const years = age(v.fecha_nacimiento);
-                  if (years < 14 || years > 120)
-                    throw new Error("La edad debe estar entre 14 y 120 años.");
-                  return save("/pacientes", v, true);
+                disabled={!data.pacientes.length || !data.enfermeros.length}
+                submit="Crear ficha"
+                onSave={async (v) => {
+                  const code = v.id_registro.trim();
+                  if (!code) throw new Error("Ingresá un identificador.");
+                  await request("/tamizajes", {
+                    method: "POST",
+                    body: {
+                      id_registro: code,
+                      consent: true,
+                      paciente: { id_paciente: Number(v.paciente) },
+                      operador: { id: Number(v.operador) },
+                      supervisor: v.supervisor
+                        ? { id: Number(v.supervisor) }
+                        : null,
+                    },
+                  });
+                  const rows = await request("/tamizajes");
+                  const created = rows.find((r) => r.id_registro === code);
+                  setModal(null);
+                  await reload();
+                  setPage("tamizajes");
+                  setSelected(created);
+                  setNotice("Ficha creada. Completá los controles.");
                 }}
               >
                 <Field
-                  name="fecha_nacimiento"
-                  label="Fecha de nacimiento"
-                  type="date"
+                  name="id_registro"
+                  label="Identificador de registro"
+                  placeholder="Ej. TAM-2026-001"
+                  maxLength={100}
                 />
-                <Field name="sexo" label="Sexo" options={sexes} />
-              </Form>
-            ) : modal === "enfermero" ? (
-              <Form
-                onSave={(v) =>
-                  save(
-                    "/enfermeros",
-                    Object.fromEntries(
-                      Object.entries(v).map(([k, val]) => [k, val.trim()]),
-                    ),
-                    true,
-                  )
-                }
-              >
-                <Field name="nombre" label="Nombre" maxLength={80} />
-                <Field name="apellido" label="Apellido" maxLength={80} />
                 <Field
-                  name="rol"
-                  label="Rol"
-                  options={["ENFERMERO", "SUPERVISOR"].map((x) => [
-                    x,
-                    label(x),
+                  name="paciente"
+                  label="Paciente"
+                  options={data.pacientes.map((p) => [
+                    p.id_paciente,
+                    `Paciente #${p.id_paciente} · ${age(p.fecha_nacimiento)} años`,
                   ])}
                 />
                 <Field
-                  name="turno"
-                  label="Turno"
-                  options={["MAÑANA", "TARDE", "VESPERTINO"].map((x) => [
-                    x,
-                    label(x),
-                  ])}
+                  name="operador"
+                  label="Operador"
+                  options={data.enfermeros
+                    .filter((p) => p.rol === "ENFERMERO")
+                    .map((p) => [p.id, `${p.nombre} ${p.apellido}`])}
                 />
+                <Field
+                  name="supervisor"
+                  label="Supervisor (opcional)"
+                  required={false}
+                  options={data.enfermeros
+                    .filter((p) => p.rol === "SUPERVISOR")
+                    .map((p) => [p.id, `${p.nombre} ${p.apellido}`])}
+                />
+                <label className="form-check checkbox wide col-12">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="consent"
+                    required
+                  />{" "}
+                  El paciente acepta el consentimiento para la evaluación.
+                </label>
               </Form>
-            ) : (
-              <>
-                <p className="muted">
-                  Seleccioná un paciente y al personal responsable. Registrá al
-                  paciente y al equipo antes de comenzar.
-                </p>
-                <Form
-                  disabled={!data.pacientes.length || !data.enfermeros.length}
-                  submit="Crear ficha"
-                  onSave={async (v) => {
-                    const code = v.id_registro.trim();
-                    if (!code) throw new Error("Ingresá un identificador.");
-                    await request("/tamizajes", {
-                      method: "POST",
-                      body: {
-                        id_registro: code,
-                        consent: true,
-                        paciente: { id_paciente: Number(v.paciente) },
-                        operador: { id: Number(v.operador) },
-                        supervisor: v.supervisor
-                          ? { id: Number(v.supervisor) }
-                          : null,
-                      },
-                    });
-                    const rows = await request("/tamizajes");
-                    const created = rows.find((r) => r.id_registro === code);
-                    setModal(null);
-                    await reload();
-                    setPage("tamizajes");
-                    setSelected(created);
-                    setNotice("Ficha creada. Completá los controles.");
-                  }}
-                >
-                  <Field
-                    name="id_registro"
-                    label="Identificador de registro"
-                    placeholder="Ej. TAM-2026-001"
-                    maxLength={100}
-                  />
-                  <Field
-                    name="paciente"
-                    label="Paciente"
-                    options={data.pacientes.map((p) => [
-                      p.id_paciente,
-                      `Paciente #${p.id_paciente} · ${age(p.fecha_nacimiento)} años`,
-                    ])}
-                  />
-                  <Field
-                    name="operador"
-                    label="Operador"
-                    options={data.enfermeros
-                      .filter((p) => p.rol === "ENFERMERO")
-                      .map((p) => [p.id, `${p.nombre} ${p.apellido}`])}
-                  />
-                  <Field
-                    name="supervisor"
-                    label="Supervisor (opcional)"
-                    required={false}
-                    options={data.enfermeros
-                      .filter((p) => p.rol === "SUPERVISOR")
-                      .map((p) => [p.id, `${p.nombre} ${p.apellido}`])}
-                  />
-                  <label className="checkbox wide">
-                    <input type="checkbox" name="consent" required /> El
-                    paciente acepta el consentimiento para la evaluación.
-                  </label>
-                </Form>
-              </>
-            )}
-          </section>
-        </div>
-      )}
+            </>
+          )}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
@@ -701,7 +728,7 @@ function Detail({ screening, onBack }) {
   }
   return (
     <>
-      <button className="text-button back" onClick={onBack}>
+      <button className="btn btn-link text-button back" onClick={onBack}>
         ← Volver a tamizajes
       </button>
       <div className="detail-intro">
@@ -718,243 +745,273 @@ function Detail({ screening, onBack }) {
         <Badge value={result ? "Evaluado" : "En curso"} />
       </div>
       {error && (
-        <p className="error" role="alert">
+        <p className="alert alert-danger error" role="alert">
           {error}
-          <button onClick={load}>Reintentar</button>
+          <button className="btn btn-outline-danger btn-sm ms-2" onClick={load}>
+            Reintentar
+          </button>
         </p>
       )}
-      <div className="tabs" role="tablist">
+      <Nav
+        variant="tabs"
+        className="tabs"
+        activeKey={tab}
+        onSelect={setTab}
+        role="tablist"
+        aria-label="Controles del tamizaje"
+      >
         {[
           ["antropometria", "01 · Antropometría"],
           ["presion", "02 · Presión arterial"],
           ["cuestionario", "03 · Cuestionario"],
           ["resultado", "04 · Resultado"],
         ].map(([key, title]) => (
-          <button
-            role="tab"
-            aria-selected={tab === key}
-            key={key}
-            onClick={() => setTab(key)}
-            className={tab === key ? "active" : ""}
-          >
-            {title}
-          </button>
+          <Nav.Item key={key}>
+            <Nav.Link
+              as="button"
+              id={`control-tab-${key}`}
+              eventKey={key}
+              role="tab"
+              aria-controls="control-panel"
+            >
+              {title}
+            </Nav.Link>
+          </Nav.Item>
         ))}
-      </div>
-      <section className="panel detail-panel">
-        {!controls ? (
-          <p role="status">Cargando controles…</p>
-        ) : tab === "antropometria" ? (
-          <>
-            <h2>Medidas antropométricas</h2>
-            <p className="muted">
-              Ingresá las medidas tomadas durante la evaluación.
-            </p>
-            {controls.anthro ? (
-              <div className="stats compact">
-                {[
-                  ["Peso", `${controls.anthro.pesoKg} kg`],
-                  ["Talla", `${controls.anthro.tallacm} cm`],
-                  ["IMC", controls.anthro.imc.toFixed(1)],
-                ].map(([k, v]) => (
-                  <div className="stat" key={k}>
-                    <span>{k}</span>
-                    <strong>{v}</strong>
+      </Nav>
+      <section
+        className="panel card"
+        id="control-panel"
+        role="tabpanel"
+        aria-labelledby={`control-tab-${tab}`}
+      >
+        <div className="card-body detail-panel">
+          {!controls ? (
+            <p role="status">Cargando controles…</p>
+          ) : tab === "antropometria" ? (
+            <>
+              <h2>Medidas antropométricas</h2>
+              <p className="muted">
+                Ingresá las medidas tomadas durante la evaluación.
+              </p>
+              {controls.anthro ? (
+                <div className="stats compact row g-3">
+                  {[
+                    ["Peso", `${controls.anthro.pesoKg} kg`],
+                    ["Talla", `${controls.anthro.tallacm} cm`],
+                    ["IMC", controls.anthro.imc.toFixed(1)],
+                  ].map(([k, v]) => (
+                    <StatCard key={k}>
+                      <span>{k}</span>
+                      <strong>{v}</strong>
+                    </StatCard>
+                  ))}
+                </div>
+              ) : (
+                <Form
+                  onSave={(v) =>
+                    add(
+                      `${base}/antropometria`,
+                      Object.fromEntries(
+                        Object.entries(v).map(([k, val]) => [k, Number(val)]),
+                      ),
+                    )
+                  }
+                >
+                  <Field
+                    name="pesoKg"
+                    label="Peso (kg)"
+                    type="number"
+                    min="30"
+                    max="300"
+                    step="0.1"
+                  />
+                  <Field
+                    name="tallacm"
+                    label="Talla (cm)"
+                    type="number"
+                    min="120"
+                    max="220"
+                    step="0.1"
+                  />
+                  <Field
+                    name="cinturacm"
+                    label="Cintura (cm)"
+                    type="number"
+                    min="1"
+                    max="300"
+                    step="0.1"
+                  />
+                </Form>
+              )}
+            </>
+          ) : tab === "presion" ? (
+            <>
+              <h2>Presión arterial</h2>
+              <p className="muted">
+                El resultado utiliza la última toma válida. Podés agregar varias
+                mediciones.
+              </p>
+              <Form
+                key={editing?.idControl || "new"}
+                submit={editing ? "Actualizar toma" : "Registrar toma"}
+                onSave={async (v) => {
+                  if (Number(v.sistolicaMmHg) <= Number(v.diastolicaMmHg))
+                    throw new Error(
+                      "La presión sistólica debe superar la diastólica.",
+                    );
+                  await add(
+                    editing
+                      ? `/tomas-presion/${editing.idControl}`
+                      : `${base}/tomas-presion`,
+                    {
+                      sistolicaMmHg: Number(v.sistolicaMmHg),
+                      diastolicaMmHg: Number(v.diastolicaMmHg),
+                    },
+                    editing ? "PUT" : "POST",
+                  );
+                  setEditing(null);
+                }}
+              >
+                <Field
+                  name="sistolicaMmHg"
+                  label="Sistólica (mmHg)"
+                  type="number"
+                  min="70"
+                  max="260"
+                  defaultValue={editing?.sistolicaMmHg}
+                />
+                <Field
+                  name="diastolicaMmHg"
+                  label="Diastólica (mmHg)"
+                  type="number"
+                  min="40"
+                  max="150"
+                  defaultValue={editing?.diastolicaMmHg}
+                />
+              </Form>
+              {editing && (
+                <button
+                  className="btn btn-link text-button"
+                  onClick={() => setEditing(null)}
+                >
+                  Cancelar edición
+                </button>
+              )}
+              <div className="pressure-list">
+                {controls.pressure.map((p) => (
+                  <div key={p.idControl}>
+                    <span>Toma {p.numeroToma}</span>
+                    <strong>
+                      {p.sistolicaMmHg} / {p.diastolicaMmHg} <small>mmHg</small>
+                    </strong>
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => setEditing(p)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      disabled={busy}
+                      onClick={async () => {
+                        if (!window.confirm("¿Eliminar esta toma de presión?"))
+                          return;
+                        setBusy(true);
+                        try {
+                          await request(`/tomas-presion/${p.idControl}`, {
+                            method: "DELETE",
+                          });
+                          await load();
+                        } catch (e) {
+                          setError(e.message);
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 ))}
               </div>
-            ) : (
-              <Form
-                onSave={(v) =>
-                  add(
-                    `${base}/antropometria`,
-                    Object.fromEntries(
-                      Object.entries(v).map(([k, val]) => [k, Number(val)]),
-                    ),
-                  )
-                }
+            </>
+          ) : tab === "cuestionario" ? (
+            <QuestionForm base={base} add={add} existing={controls.questions} />
+          ) : (
+            <>
+              <h2>Resultado de la evaluación</h2>
+              <p className="muted">
+                Completá antropometría, presión y cuestionario antes de
+                calcular. Los resultados se obtienen del servidor. Recalculá
+                después de modificar los controles para actualizar el informe.
+              </p>
+              <button
+                className="btn btn-primary primary"
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  setError("");
+                  try {
+                    setResult(
+                      await request(`${base}/resultado`, { method: "POST" }),
+                    );
+                  } catch (e) {
+                    setError(e.message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
-                <Field
-                  name="pesoKg"
-                  label="Peso (kg)"
-                  type="number"
-                  min="30"
-                  max="300"
-                  step="0.1"
-                />
-                <Field
-                  name="tallacm"
-                  label="Talla (cm)"
-                  type="number"
-                  min="120"
-                  max="220"
-                  step="0.1"
-                />
-                <Field
-                  name="cinturacm"
-                  label="Cintura (cm)"
-                  type="number"
-                  min="1"
-                  max="300"
-                  step="0.1"
-                />
-              </Form>
-            )}
-          </>
-        ) : tab === "presion" ? (
-          <>
-            <h2>Presión arterial</h2>
-            <p className="muted">
-              El resultado utiliza la última toma válida. Podés agregar varias
-              mediciones.
-            </p>
-            <Form
-              key={editing?.idControl || "new"}
-              submit={editing ? "Actualizar toma" : "Registrar toma"}
-              onSave={async (v) => {
-                if (Number(v.sistolicaMmHg) <= Number(v.diastolicaMmHg))
-                  throw new Error(
-                    "La presión sistólica debe superar la diastólica.",
-                  );
-                await add(
-                  editing
-                    ? `/tomas-presion/${editing.idControl}`
-                    : `${base}/tomas-presion`,
-                  {
-                    sistolicaMmHg: Number(v.sistolicaMmHg),
-                    diastolicaMmHg: Number(v.diastolicaMmHg),
-                  },
-                  editing ? "PUT" : "POST",
-                );
-                setEditing(null);
-              }}
-            >
-              <Field
-                name="sistolicaMmHg"
-                label="Sistólica (mmHg)"
-                type="number"
-                min="70"
-                max="260"
-                defaultValue={editing?.sistolicaMmHg}
-              />
-              <Field
-                name="diastolicaMmHg"
-                label="Diastólica (mmHg)"
-                type="number"
-                min="40"
-                max="150"
-                defaultValue={editing?.diastolicaMmHg}
-              />
-            </Form>
-            {editing && (
-              <button className="text-button" onClick={() => setEditing(null)}>
-                Cancelar edición
+                {busy
+                  ? "Calculando…"
+                  : result
+                    ? "Recalcular resultado"
+                    : "Calcular resultado"}
               </button>
-            )}
-            <div className="pressure-list">
-              {controls.pressure.map((p) => (
-                <div key={p.idControl}>
-                  <span>Toma {p.numeroToma}</span>
-                  <strong>
-                    {p.sistolicaMmHg} / {p.diastolicaMmHg} <small>mmHg</small>
-                  </strong>
-                  <button onClick={() => setEditing(p)}>Editar</button>
+              {result && (
+                <div className="result">
+                  <div className="result-heading">
+                    <h3>Evaluación integral</h3>
+                    <Badge value={result.semaforoGlobal} />
+                  </div>
+                  {result.derivacionInmediata && (
+                    <p className="alert alert-danger error">
+                      Derivación inmediata · Avisar al docente responsable.
+                    </p>
+                  )}
+                  <div className="stats compact row g-3">
+                    <StatCard>
+                      <span>FINDRISC</span>
+                      <strong>{result.puntajeFindrisc}</strong>
+                      <small>{result.categoriaFindrisc}</small>
+                    </StatCard>
+                    <StatCard>
+                      <span>Riesgo cardiovascular</span>
+                      <strong className="smaller">
+                        {label(result.riesgoCardiovascular)}
+                      </strong>
+                      <Badge value={result.semaforoRiesgoCardiovascular} />
+                    </StatCard>
+                    <StatCard>
+                      <span>IMC / Presión</span>
+                      <Badge value={result.semaforoImc} />
+                      <Badge value={result.semaforoPresion} />
+                    </StatCard>
+                  </div>
+                  <p>{result.observaciones}</p>
+                  <p>Derivación: {result.deriva ? "Sí" : "No"}</p>
                   <button
-                    disabled={busy}
-                    onClick={async () => {
-                      if (!window.confirm("¿Eliminar esta toma de presión?"))
-                        return;
-                      setBusy(true);
-                      try {
-                        await request(`/tomas-presion/${p.idControl}`, {
-                          method: "DELETE",
-                        });
-                        await load();
-                      } catch (e) {
-                        setError(e.message);
-                      } finally {
-                        setBusy(false);
-                      }
-                    }}
+                    className="btn btn-link text-button"
+                    onClick={() => window.print()}
                   >
-                    Eliminar
+                    <Printer size={16} /> Imprimir informe
                   </button>
                 </div>
-              ))}
-            </div>
-          </>
-        ) : tab === "cuestionario" ? (
-          <QuestionForm base={base} add={add} existing={controls.questions} />
-        ) : (
-          <>
-            <h2>Resultado de la evaluación</h2>
-            <p className="muted">
-              Completá antropometría, presión y cuestionario antes de calcular.
-              Los resultados se obtienen del servidor. Recalculá después de
-              modificar los controles para actualizar el informe.
-            </p>
-            <button
-              className="primary"
-              disabled={busy}
-              onClick={async () => {
-                setBusy(true);
-                setError("");
-                try {
-                  setResult(
-                    await request(`${base}/resultado`, { method: "POST" }),
-                  );
-                } catch (e) {
-                  setError(e.message);
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              {busy
-                ? "Calculando…"
-                : result
-                  ? "Recalcular resultado"
-                  : "Calcular resultado"}
-            </button>
-            {result && (
-              <div className="result">
-                <div className="result-heading">
-                  <h3>Evaluación integral</h3>
-                  <Badge value={result.semaforoGlobal} />
-                </div>
-                {result.derivacionInmediata && (
-                  <p className="error">
-                    Derivación inmediata · Avisar al docente responsable.
-                  </p>
-                )}
-                <div className="stats compact">
-                  <div className="stat">
-                    <span>FINDRISC</span>
-                    <strong>{result.puntajeFindrisc}</strong>
-                    <small>{result.categoriaFindrisc}</small>
-                  </div>
-                  <div className="stat">
-                    <span>Riesgo cardiovascular</span>
-                    <strong className="smaller">
-                      {label(result.riesgoCardiovascular)}
-                    </strong>
-                    <Badge value={result.semaforoRiesgoCardiovascular} />
-                  </div>
-                  <div className="stat">
-                    <span>IMC / Presión</span>
-                    <Badge value={result.semaforoImc} />
-                    <Badge value={result.semaforoPresion} />
-                  </div>
-                </div>
-                <p>{result.observaciones}</p>
-                <p>Derivación: {result.deriva ? "Sí" : "No"}</p>
-                <button className="text-button" onClick={() => window.print()}>
-                  <Printer size={16} /> Imprimir informe
-                </button>
-              </div>
-            )}
-          </>
-        )}
+              )}
+            </>
+          )}
+        </div>
       </section>
     </>
   );
@@ -970,7 +1027,10 @@ function QuestionForm({ base, add, existing }) {
       </p>
       {existing || done ? (
         <>
-          <p className="notice" role="status">
+          <p
+            className="alert alert-success notice d-flex align-items-center gap-2"
+            role="status"
+          >
             Cuestionario guardado correctamente.
           </p>
           {existing && (
@@ -1052,7 +1112,7 @@ function QuestionForm({ base, add, existing }) {
             onChange={(e) => setFamily(e.target.value)}
           />
           {family && family !== "NO" && (
-            <fieldset className="wide">
+            <fieldset className="wide col-12">
               <legend>Tipos de antecedentes (seleccioná al menos uno)</legend>
               {[
                 "DIABETES",
@@ -1060,8 +1120,13 @@ function QuestionForm({ base, add, existing }) {
                 "ENFERMEDAD_CARDIOVASCULAR",
                 "OTRO",
               ].map((x) => (
-                <label key={x} className="checkbox">
-                  <input name="tiposAntecedentes" type="checkbox" value={x} />
+                <label key={x} className="form-check checkbox">
+                  <input
+                    className="form-check-input"
+                    name="tiposAntecedentes"
+                    type="checkbox"
+                    value={x}
+                  />
                   {label(x)}
                 </label>
               ))}

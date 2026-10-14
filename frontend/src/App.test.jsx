@@ -1,5 +1,11 @@
 import React from "react";
-import { render, screen, cleanup, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  cleanup,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, it, expect, afterEach } from "vitest";
 import App from "./App";
@@ -10,7 +16,9 @@ afterEach(() => {
 function api() {
   const fetch = vi.fn(async (url, options = {}) => {
     let body = {};
-    if (url === "/api/pacientes")
+    if (options.method === "POST" && url.startsWith("/api/pacientes?"))
+      body = { id_paciente: 2, fecha_nacimiento: "1990-04-23", sexo: "F" };
+    else if (url === "/api/pacientes")
       body = [{ id_paciente: 1, fecha_nacimiento: "1980-01-01", sexo: "F" }];
     else if (url === "/api/enfermeros")
       body = [
@@ -84,4 +92,50 @@ it("expone errores de conexión y permite reintentar", async () => {
     ),
   );
   expect(screen.getByRole("button", { name: "Reintentar" })).toBeTruthy();
+});
+it("registra un paciente desde el formulario y confirma el guardado", async () => {
+  const fetch = api();
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByRole("button", { name: /Abrir ficha/ });
+  await user.click(screen.getByRole("button", { name: "Pacientes" }));
+  await user.click(screen.getByRole("button", { name: "Nuevo paciente" }));
+  const dialog = await screen.findByRole("dialog", {
+    name: "Registrar paciente",
+  });
+  await user.type(
+    within(dialog).getByLabelText("Fecha de nacimiento"),
+    "1990-04-23",
+  );
+  await user.selectOptions(within(dialog).getByLabelText("Sexo"), "F");
+  await user.click(within(dialog).getByRole("button", { name: "Guardar" }));
+  await screen.findByText("Registro guardado correctamente.");
+  expect(fetch).toHaveBeenCalledWith(
+    "/api/pacientes?fecha_nacimiento=1990-04-23&sexo=F",
+    expect.objectContaining({ method: "POST", body: undefined }),
+  );
+  await waitFor(() =>
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull(),
+  );
+});
+it("cierra el formulario con Escape y devuelve el foco al botón de apertura", async () => {
+  const fetch = api();
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByRole("button", { name: /Abrir ficha/ });
+  await user.click(screen.getByRole("button", { name: "Pacientes" }));
+  const launcher = screen.getByRole("button", { name: "Nuevo paciente" });
+  await user.click(launcher);
+  const dialog = await screen.findByRole("dialog", {
+    name: "Registrar paciente",
+  });
+  await user.click(within(dialog).getByLabelText("Fecha de nacimiento"));
+  await user.keyboard("{Escape}");
+  await waitFor(() => {
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+    expect(document.activeElement).toBe(launcher);
+  });
+  expect(
+    fetch.mock.calls.some(([, options]) => options?.method === "POST"),
+  ).toBe(false);
 });
