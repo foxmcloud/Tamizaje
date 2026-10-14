@@ -33,14 +33,19 @@ Sin el perfil `demo`, se conserva la conexión definida en `src/main/resources/a
 
 ## Flujo de prueba
 
-La pantalla inicial **Registro directo** permite completar toda la atención en un solo formulario:
+La pantalla inicial guía la atención **paso a paso**, mostrando una sección a la vez:
 
 1. Agregá el enfermero (nombre, apellido y turno), o elegí uno registrado.
 2. Agregá el paciente (fecha de nacimiento y sexo), o elegí uno registrado.
 3. Confirmá el código de ficha y el consentimiento. El supervisor es opcional.
-4. Ingresá antropometría, presión y las respuestas del cuestionario, sin cambiar de pestaña o pantalla.
-5. Presioná **Guardar atención y calcular resultado**. El enfermero, el paciente, la ficha, los controles y el resultado se guardan juntos en una transacción. Si hay un error, no quedan altas parciales y el formulario conserva sus datos para corregirlos.
-6. Revisá e imprimí el resultado en esa misma pantalla. **Nueva atención** permite continuar con otro paciente reutilizando el enfermero recién registrado.
+4. Ingresá peso, talla y cintura en **Medidas**.
+5. Registrá la **Presión arterial**.
+6. Completá **Hábitos y antecedentes**.
+7. En **Revisar y guardar**, verificá el resumen. Los botones **Editar** permiten volver a cada sección. Presioná **Guardar atención y calcular resultado** para confirmar.
+
+**Continuar** valida los datos del paso actual. **Anterior** y los pasos ya recorridos permiten volver conservando lo ingresado. No se crean registros al avanzar: el enfermero, el paciente, la ficha, los controles y el resultado se guardan juntos en una transacción al confirmar el último paso. Si hay un error, no quedan altas parciales y se conservan los datos para corregirlos.
+
+Al guardar, se muestra el informe para revisar e imprimir. **Nueva atención** permite continuar con otro paciente reutilizando el enfermero recién registrado.
 
 Los listados anteriores permiten consultar registros y abrir fichas para agregar/editar/eliminar tomas, recalcular e imprimir resultados. La ficha se puede reabrir al recargar usando su identificador en el fragmento de URL.
 

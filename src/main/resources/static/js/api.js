@@ -301,10 +301,12 @@ function registrationText(value, limit, message) {
   return text;
 }
 
-/** Validate the complete direct form before sending one registration request. */
-export function buildDirectRegistrationPayload(values) {
+function registrationForm(values) {
   if (!values || typeof values !== "object")
     throw new Error("Completá los datos del formulario.");
+}
+
+function registrationContext(values) {
   const idRegistro = registrationText(
     values.idRegistro,
     255,
@@ -312,11 +314,17 @@ export function buildDirectRegistrationPayload(values) {
   );
   if (values.consent !== true)
     throw new Error("Se requiere el consentimiento del paciente.");
+  const supervisorId = registrationId(
+    values.supervisorId,
+    "Seleccioná un supervisor registrado válido.",
+    true,
+  );
+  return { idRegistro, consent: true, supervisorId };
+}
+
+function registrationNurse(values) {
   if (!["nuevo", "existente"].includes(values.operadorMode))
     throw new Error("Elegí cómo registrar al enfermero.");
-  if (!["nuevo", "existente"].includes(values.pacienteMode))
-    throw new Error("Elegí cómo registrar al paciente.");
-
   let operadorId = null;
   let operador = null;
   if (values.operadorMode === "existente") {
@@ -340,7 +348,12 @@ export function buildDirectRegistrationPayload(values) {
       throw new Error("Seleccioná el turno del enfermero.");
     operador = { nombre, apellido, turno: form.turno };
   }
+  return { operadorId, operador };
+}
 
+function registrationPatient(values) {
+  if (!["nuevo", "existente"].includes(values.pacienteMode))
+    throw new Error("Elegí cómo registrar al paciente.");
   let pacienteId = null;
   let paciente = null;
   if (values.pacienteMode === "existente") {
@@ -359,40 +372,70 @@ export function buildDirectRegistrationPayload(values) {
       sexo: validated.sexo,
     };
   }
+  return { pacienteId, paciente };
+}
 
-  const supervisorId = registrationId(
-    values.supervisorId,
-    "Seleccioná un supervisor registrado válido.",
-    true,
-  );
+function registrationAnthropometry(values, requiredWaist = false) {
   const anthropometry = validateAnthropometry(values.antropometria || {});
-  const pressure = validatePressure(values.tomaPresion || {});
-  const questionnaire = normalizeQuestionnaire(values.cuestionario || {});
-
+  if (requiredWaist && anthropometry.cinturacm <= 0)
+    throw new Error(
+      "Ingresá una medida de cintura mayor que 0 y de hasta 300 cm.",
+    );
   return {
-    idRegistro,
-    consent: true,
-    operadorId,
-    operador,
-    pacienteId,
-    paciente,
-    supervisorId,
-    antropometria: {
-      pesoKg: anthropometry.pesoKg,
-      tallacm: anthropometry.tallacm,
-      cinturacm: anthropometry.cinturacm,
-    },
-    tomaPresion: {
-      sistolicaMmHg: pressure.sistolicaMmHg,
-      diastolicaMmHg: pressure.diastolicaMmHg,
-    },
-    cuestionario: {
-      actividadFisica: questionnaire.actividadFisica,
-      frutasVerduras: questionnaire.frutasVerduras,
-      medicacion: questionnaire.medicacion,
-      tabaquismo: questionnaire.tabaquismo,
-      antecedenteFamiliar: questionnaire.antecedenteFamiliar,
-      tiposAntecedentes: questionnaire.tiposAntecedentes,
-    },
+    pesoKg: anthropometry.pesoKg,
+    tallacm: anthropometry.tallacm,
+    cinturacm: anthropometry.cinturacm,
+  };
+}
+
+function registrationPressure(values) {
+  const pressure = validatePressure(values.tomaPresion || {});
+  return {
+    sistolicaMmHg: pressure.sistolicaMmHg,
+    diastolicaMmHg: pressure.diastolicaMmHg,
+  };
+}
+
+function registrationQuestionnaire(values) {
+  const questionnaire = normalizeQuestionnaire(values.cuestionario || {});
+  return {
+    actividadFisica: questionnaire.actividadFisica,
+    frutasVerduras: questionnaire.frutasVerduras,
+    medicacion: questionnaire.medicacion,
+    tabaquismo: questionnaire.tabaquismo,
+    antecedenteFamiliar: questionnaire.antecedenteFamiliar,
+    tiposAntecedentes: questionnaire.tiposAntecedentes,
+  };
+}
+
+/** Validate just the visible wizard step, or the complete draft at step 6. */
+export function validateDirectRegistrationStep(values, index) {
+  registrationForm(values);
+  const steps = [
+    registrationNurse,
+    registrationPatient,
+    registrationContext,
+    (draft) => registrationAnthropometry(draft, true),
+    registrationPressure,
+    registrationQuestionnaire,
+  ];
+  if (!Number.isInteger(index) || index < 0 || index > steps.length)
+    throw new Error("El paso del formulario no es válido.");
+  if (index < steps.length) return steps[index](values);
+  // Validate in screen order so the first incomplete step remains actionable.
+  steps.forEach((validate) => validate(values));
+  return buildDirectRegistrationPayload(values);
+}
+
+/** Validate the complete direct form before sending one registration request. */
+export function buildDirectRegistrationPayload(values) {
+  registrationForm(values);
+  return {
+    ...registrationContext(values),
+    ...registrationNurse(values),
+    ...registrationPatient(values),
+    antropometria: registrationAnthropometry(values),
+    tomaPresion: registrationPressure(values),
+    cuestionario: registrationQuestionnaire(values),
   };
 }

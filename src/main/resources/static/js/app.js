@@ -20,6 +20,7 @@ import {
   validateAnthropometry,
   normalizeQuestionnaire,
   buildDirectRegistrationPayload,
+  validateDirectRegistrationStep,
 } from "./api.js";
 
 function freshDirectForm() {
@@ -73,6 +74,43 @@ createApp({
     const editingPressure = ref(null),
       resultOutdated = ref(false);
     const directForm = reactive(freshDirectForm());
+    const directStep = ref(0);
+    const directMaxStep = ref(0);
+    const directSteps = [
+      {
+        title: "Enfermero",
+        description: "Agregá al enfermero responsable o elegí uno registrado.",
+      },
+      {
+        title: "Paciente",
+        description:
+          "Ingresá los datos del paciente o seleccioná uno registrado.",
+      },
+      {
+        title: "Atención",
+        description:
+          "Confirmá el identificador y el consentimiento del paciente.",
+      },
+      {
+        title: "Medidas",
+        description: "Registrá el peso, la talla y la cintura.",
+      },
+      { title: "Presión", description: "Ingresá la toma de presión arterial." },
+      {
+        title: "Hábitos y antecedentes",
+        description: "Completá las respuestas junto al paciente.",
+      },
+      {
+        title: "Revisar y guardar",
+        description: "Revisá los datos antes de guardar la atención completa.",
+      },
+    ];
+    const directStepDescription = computed(
+      () => directSteps[directStep.value].description,
+    );
+    const directProgress = computed(
+      () => (directStep.value + 1) / directSteps.length,
+    );
     const directError = ref("");
     const directSaved = ref(null);
     const directResult = computed(() => directSaved.value?.resultado || null);
@@ -102,7 +140,7 @@ createApp({
       tiposAntecedentes: [],
     });
     const sections = [
-      { key: "registro", title: "Registro directo", icon: "＋" },
+      { key: "registro", title: "Registro por pasos", icon: "＋" },
       { key: "inicio", title: "Resumen", icon: "◈" },
       { key: "tamizajes", title: "Tamizajes", icon: "▤" },
       { key: "pacientes", title: "Pacientes", icon: "♧" },
@@ -139,6 +177,52 @@ createApp({
     const supervisors = computed(() =>
       staff.value.filter((person) => person.rol === "SUPERVISOR"),
     );
+    const directReview = computed(() => {
+      const operador =
+        directForm.operadorMode === "nuevo"
+          ? directForm.operador
+          : operators.value.find(
+              (person) => person.id === Number(directForm.operadorId),
+            );
+      const paciente =
+        directForm.pacienteMode === "nuevo"
+          ? {
+              fecha_nacimiento: directForm.paciente.fechaNacimiento,
+              sexo: directForm.paciente.sexo,
+            }
+          : patients.value.find(
+              (person) => person.id_paciente === Number(directForm.pacienteId),
+            );
+      const supervisor = supervisors.value.find(
+        (person) => person.id === Number(directForm.supervisorId),
+      );
+      const answers = directForm.cuestionario;
+      const booleanLabel = (value) =>
+        value === true || value === "true"
+          ? "Sí"
+          : value === false || value === "false"
+            ? "No"
+            : "Sin responder";
+      const familyTypes =
+        answers.antecedenteFamiliar !== "NO" && answers.tiposAntecedentes.length
+          ? ` (${answers.tiposAntecedentes.map(label).join(", ")})`
+          : "";
+      return {
+        operador: operador
+          ? `${operador.nombre.trim()} ${operador.apellido.trim()} · ${label(operador.turno)}`
+          : "Sin seleccionar",
+        paciente: paciente
+          ? `${directForm.pacienteMode === "existente" ? `Paciente #${paciente.id_paciente} · ` : "Paciente nuevo · "}${dateFormat(paciente.fecha_nacimiento)} · ${sexLabel(paciente.sexo)}`
+          : "Sin seleccionar",
+        registro: `${directForm.idRegistro.trim()} · Consentimiento ${directForm.consent ? "aceptado" : "pendiente"}`,
+        supervisor: supervisor
+          ? `${supervisor.nombre} ${supervisor.apellido}`
+          : "Sin supervisor",
+        antropometria: `${directForm.antropometria.pesoKg} kg · ${directForm.antropometria.tallacm} cm de talla · ${directForm.antropometria.cinturacm} cm de cintura`,
+        presion: `${directForm.tomaPresion.sistolicaMmHg} / ${directForm.tomaPresion.diastolicaMmHg} mmHg`,
+        cuestionario: `Actividad física: ${booleanLabel(answers.actividadFisica)}. Frutas y verduras: ${booleanLabel(answers.frutasVerduras)}. Medicación: ${booleanLabel(answers.medicacion)}. Tabaquismo: ${label(answers.tabaquismo)}. Familiares: ${label(answers.antecedenteFamiliar)}${familyTypes}.`,
+      };
+    });
     const canCreateScreening = computed(
       () => patients.value.length > 0 && operators.value.length > 0,
     );
@@ -167,7 +251,7 @@ createApp({
       record.value
         ? `Registro ${record.value.id_registro}`
         : page.value === "registro"
-          ? "Agregá el enfermero, el paciente y sus controles en un solo formulario."
+          ? "Completá la atención paso a paso, desde el enfermero hasta el resultado."
           : "Registrá, evaluá y acompañá cada paso de la atención.",
     );
     const modalTitle = computed(
@@ -203,24 +287,85 @@ createApp({
       }
       directSaved.value = null;
       directError.value = "";
+      directStep.value = 0;
+      directMaxStep.value = 0;
     }
     function startDirectRegistration() {
       if (busy.value) return;
       resetDirectRegistration();
       notice.value = "";
       navigate("registro");
-      nextTick(() =>
-        document
-          .getElementById(
-            directForm.operadorMode === "existente"
-              ? "direct-patient-birthdate"
-              : "direct-nurse-name",
-          )
-          ?.focus(),
+      focusDirectStep();
+    }
+    async function focusDirectStep(error = false) {
+      await nextTick();
+      const target = document.getElementById(
+        error ? "direct-error" : "direct-step-heading",
       );
+      target?.focus({ preventScroll: true });
+      document
+        .getElementById("direct-wizard")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function validateDirectStepsThrough(last) {
+      for (let index = 0; index <= last; index++) {
+        try {
+          validateDirectRegistrationStep(directForm, index);
+        } catch (error) {
+          directStep.value = index;
+          directError.value = error.message;
+          focusDirectStep(true);
+          return false;
+        }
+      }
+      return true;
+    }
+    function goToDirectStep(index) {
+      if (
+        busy.value ||
+        directSaved.value ||
+        !Number.isInteger(index) ||
+        index < 0 ||
+        index > directMaxStep.value
+      )
+        return;
+      directError.value = "";
+      if (index > directStep.value && !validateDirectStepsThrough(index - 1))
+        return;
+      directStep.value = index;
+      focusDirectStep();
+    }
+    function previousDirectStep() {
+      goToDirectStep(directStep.value - 1);
+    }
+    async function submitDirectStep() {
+      if (busy.value || loading.value || loadError.value || directSaved.value)
+        return;
+      directError.value = "";
+      if (directStep.value === directSteps.length - 1) {
+        await saveDirectRegistration();
+        return;
+      }
+      try {
+        validateDirectRegistrationStep(directForm, directStep.value);
+        const form = document.getElementById("direct-registration-form");
+        if (form && !form.reportValidity()) return;
+        directStep.value += 1;
+        directMaxStep.value = Math.max(directMaxStep.value, directStep.value);
+        focusDirectStep();
+      } catch (error) {
+        directError.value = error.message;
+        focusDirectStep(true);
+      }
     }
     async function saveDirectRegistration() {
-      if (busy.value || directSaved.value) return;
+      if (
+        busy.value ||
+        directSaved.value ||
+        directStep.value !== directSteps.length - 1
+      )
+        return;
+      if (!validateDirectStepsThrough(directSteps.length - 2)) return;
       busy.value = true;
       directError.value = "";
       try {
@@ -238,8 +383,12 @@ createApp({
         document
           .getElementById("direct-result")
           ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        document
+          .getElementById("direct-result")
+          ?.focus({ preventScroll: true });
       } catch (error) {
         directError.value = error.message;
+        focusDirectStep(true);
       } finally {
         busy.value = false;
       }
@@ -606,11 +755,20 @@ createApp({
     return {
       page,
       directForm,
+      directStep,
+      directMaxStep,
+      directSteps,
+      directStepDescription,
+      directProgress,
+      directReview,
       directError,
       directSaved,
       directResult,
       directMode,
       startDirectRegistration,
+      submitDirectStep,
+      previousDirectStep,
+      goToDirectStep,
       saveDirectRegistration,
       printDirectResult,
       query,

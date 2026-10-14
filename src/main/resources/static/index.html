@@ -128,20 +128,29 @@
 
           <template v-if="!record && page === 'registro'">
             <div class="direct-registration">
-              <p class="direct-intro alert alert-light border">
-                Completá los datos del enfermero, del paciente y sus controles en este mismo formulario. Al guardar se registra toda la atención y se calcula el resultado.
-              </p>
-              <div v-if="directError" class="alert alert-danger" role="alert">
-                {{ directError }}
-              </div>
-              <div v-if="directSaved" class="alert alert-success direct-saved" role="status">
-                Atención guardada. El resultado está al final de este formulario.
-              </div>
-              <form id="direct-registration-form" @submit.prevent="saveDirectRegistration()">
-                <fieldset class="direct-fields" :disabled="busy || Boolean(directSaved)">
+              <div v-if="!directSaved" id="direct-wizard" class="direct-wizard">
+                <nav class="direct-step-nav" aria-label="Pasos de la atención">
+                  <ol class="direct-step-list">
+                    <li v-for="(step, index) in directSteps" :key="step.title">
+                      <button type="button" class="direct-step-button" :class="{ active: directStep === index, completed: index < directMaxStep && directStep !== index }" :data-step-index="index" :aria-label="'Paso ' + (index + 1) + ': ' + step.title" :aria-current="directStep === index ? 'step' : null" :disabled="busy || loading || Boolean(loadError) || index > directMaxStep" @click="goToDirectStep(index)">
+                        <span class="direct-step-number" aria-hidden="true">{{ index + 1 }}</span><span class="direct-step-title">{{ step.title }}</span>
+                      </button>
+                    </li>
+                  </ol>
+                </nav>
+                <div id="direct-step-heading" class="direct-step-status" tabindex="-1" aria-live="polite">
+                  <p class="direct-step-counter">Paso {{ directStep + 1 }} de {{ directSteps.length }} <span aria-hidden="true">·</span> <strong>{{ directSteps[directStep].title }}</strong></p>
+                  <p class="muted mb-0">{{ directStepDescription }}</p>
+                </div>
+                <div class="progress direct-progress" role="progressbar" aria-label="Progreso de la atención" :aria-valuenow="directStep + 1" aria-valuemin="0" :aria-valuemax="directSteps.length" :aria-valuetext="'Paso ' + (directStep + 1) + ' de ' + directSteps.length">
+                  <div class="progress-bar" :style="{ width: directProgress * 100 + '%' }"></div>
+                </div>
+                <div v-if="directError" id="direct-error" class="alert alert-danger" role="alert" tabindex="-1">{{ directError }}</div>
+                <form id="direct-registration-form" novalidate @submit.prevent="submitDirectStep()">
+                <fieldset class="direct-fields" :disabled="busy || loading || Boolean(loadError)">
                   <legend class="visually-hidden">Registrar enfermero, paciente y control de tamizaje</legend>
 
-                  <section class="panel card direct-section" aria-labelledby="direct-nurse-heading">
+                  <section v-if="directStep === 0" class="panel card direct-section" aria-labelledby="direct-nurse-heading">
                     <div class="panel-head card-header">
                       <div>
                         <h2 id="direct-nurse-heading"><span class="direct-section-number" aria-hidden="true">1</span> Enfermero</h2>
@@ -187,7 +196,7 @@
                     </div>
                   </section>
 
-                  <section class="panel card direct-section" aria-labelledby="direct-patient-heading">
+                  <section v-if="directStep === 1" class="panel card direct-section" aria-labelledby="direct-patient-heading">
                     <div class="panel-head card-header">
                       <div>
                         <h2 id="direct-patient-heading"><span class="direct-section-number" aria-hidden="true">2</span> Paciente</h2>
@@ -230,7 +239,7 @@
                     </div>
                   </section>
 
-                  <section class="panel card direct-section" aria-labelledby="direct-attention-heading">
+                  <section v-if="directStep === 2" class="panel card direct-section" aria-labelledby="direct-attention-heading">
                     <div class="panel-head card-header">
                       <div>
                         <h2 id="direct-attention-heading"><span class="direct-section-number" aria-hidden="true">3</span> Datos de la atención</h2>
@@ -260,10 +269,10 @@
                     </div>
                   </section>
 
-                  <section class="panel card direct-section" aria-labelledby="direct-anthropometry-heading">
+                  <section v-if="directStep === 3" class="panel card direct-section" aria-labelledby="direct-anthropometry-heading">
                     <div class="panel-head card-header">
                       <div>
-                        <h2 id="direct-anthropometry-heading"><span class="direct-section-number" aria-hidden="true">4</span> Antropometría</h2>
+                        <h2 id="direct-anthropometry-heading"><span class="direct-section-number" aria-hidden="true">4</span> Medidas</h2>
                         <p class="muted">Ingresá las medidas tomadas durante este control.</p>
                       </div>
                     </div>
@@ -285,7 +294,7 @@
                     </div>
                   </section>
 
-                  <section class="panel card direct-section" aria-labelledby="direct-pressure-heading">
+                  <section v-if="directStep === 4" class="panel card direct-section" aria-labelledby="direct-pressure-heading">
                     <div class="panel-head card-header">
                       <div>
                         <h2 id="direct-pressure-heading"><span class="direct-section-number" aria-hidden="true">5</span> Presión arterial</h2>
@@ -306,7 +315,7 @@
                     </div>
                   </section>
 
-                  <section class="panel card direct-section" aria-labelledby="direct-questionnaire-heading">
+                  <section v-if="directStep === 5" class="panel card direct-section" aria-labelledby="direct-questionnaire-heading">
                     <div class="panel-head card-header">
                       <div>
                         <h2 id="direct-questionnaire-heading"><span class="direct-section-number" aria-hidden="true">6</span> Hábitos y antecedentes</h2>
@@ -357,15 +366,56 @@
                       </div>
                     </div>
                   </section>
+
+                  <section v-if="directStep === 6" class="panel card direct-section" aria-labelledby="direct-review-heading">
+                    <div class="panel-head card-header">
+                      <div>
+                        <h2 id="direct-review-heading"><span class="direct-section-number" aria-hidden="true">7</span> Revisar y guardar</h2>
+                        <p class="muted">Revisá la información antes de confirmar la atención.</p>
+                      </div>
+                    </div>
+                    <div class="card-body detail-panel">
+                      <dl class="direct-review mb-0">
+                        <div class="direct-review-item">
+                          <div><dt>Enfermero</dt><dd>{{ directReview.operador }}</dd></div>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" @click="goToDirectStep(0)" aria-label="Editar enfermero">Editar</button>
+                        </div>
+                        <div class="direct-review-item">
+                          <div><dt>Paciente</dt><dd>{{ directReview.paciente }}</dd></div>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" @click="goToDirectStep(1)" aria-label="Editar paciente">Editar</button>
+                        </div>
+                        <div class="direct-review-item">
+                          <div><dt>Atención</dt><dd>{{ directReview.registro }}</dd><dt>Supervisor</dt><dd>{{ directReview.supervisor }}</dd></div>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" @click="goToDirectStep(2)" aria-label="Editar datos de la atención">Editar</button>
+                        </div>
+                        <div class="direct-review-item">
+                          <div><dt>Medidas</dt><dd>{{ directReview.antropometria }}</dd></div>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" @click="goToDirectStep(3)" aria-label="Editar medidas">Editar</button>
+                        </div>
+                        <div class="direct-review-item">
+                          <div><dt>Presión arterial</dt><dd>{{ directReview.presion }}</dd></div>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" @click="goToDirectStep(4)" aria-label="Editar presión arterial">Editar</button>
+                        </div>
+                        <div class="direct-review-item">
+                          <div><dt>Hábitos y antecedentes</dt><dd class="direct-review-habits">{{ directReview.cuestionario }}</dd></div>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" @click="goToDirectStep(5)" aria-label="Editar hábitos y antecedentes">Editar</button>
+                        </div>
+                      </dl>
+                    </div>
+                  </section>
                 </fieldset>
-                <div v-if="!directSaved" class="direct-submit d-flex flex-wrap align-items-center justify-content-between gap-3">
-                  <p class="muted m-0">Todos los datos se guardan juntos al finalizar la atención.</p>
-                  <button type="submit" class="btn btn-primary primary" :disabled="busy || loading || Boolean(loadError)">
-                    <span v-if="busy" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                    {{ busy ? 'Guardando atención…' : 'Guardar atención y calcular resultado' }}
-                  </button>
+                <div class="direct-submit">
+                  <p class="muted m-0">{{ directStep === directSteps.length - 1 ? 'Al confirmar, todos los datos se guardan juntos.' : 'Los datos se conservan al avanzar o volver.' }}</p>
+                  <div class="direct-step-actions">
+                    <button v-if="directStep > 0" type="button" class="btn btn-outline-secondary" :disabled="busy || loading || Boolean(loadError)" @click="previousDirectStep()">Anterior</button>
+                    <button type="submit" class="btn btn-primary primary" :disabled="busy || loading || Boolean(loadError)">
+                      <span v-if="busy" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                      {{ busy ? 'Guardando atención…' : directStep === directSteps.length - 1 ? 'Guardar atención y calcular resultado' : 'Continuar' }}
+                    </button>
+                  </div>
                 </div>
               </form>
+              </div>
 
               <article v-if="directResult" id="direct-result" class="result panel card mt-4" aria-labelledby="direct-result-heading" tabindex="-1">
                 <div class="card-body direct-result-body">
