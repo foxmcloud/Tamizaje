@@ -274,3 +274,125 @@ export function validatePatient(values) {
     sexo: values.sexo,
   };
 }
+
+function registrationId(value, message, optional = false) {
+  if (
+    optional &&
+    (value === undefined ||
+      value === null ||
+      (typeof value === "string" && !value.trim()))
+  )
+    return null;
+  if (
+    (typeof value !== "number" && typeof value !== "string") ||
+    (typeof value === "string" && !/^\d+$/.test(value.trim()))
+  )
+    throw new Error(message);
+  const id = Number(value);
+  if (!Number.isInteger(id) || id < 1 || id > 2147483647)
+    throw new Error(message);
+  return id;
+}
+
+function registrationText(value, limit, message) {
+  if (typeof value !== "string") throw new Error(message);
+  const text = value.trim();
+  if (!text || text.length > limit) throw new Error(message);
+  return text;
+}
+
+/** Validate the complete direct form before sending one registration request. */
+export function buildDirectRegistrationPayload(values) {
+  if (!values || typeof values !== "object")
+    throw new Error("Completá los datos del formulario.");
+  const idRegistro = registrationText(
+    values.idRegistro,
+    255,
+    "Ingresá un identificador de registro de hasta 255 caracteres.",
+  );
+  if (values.consent !== true)
+    throw new Error("Se requiere el consentimiento del paciente.");
+  if (!["nuevo", "existente"].includes(values.operadorMode))
+    throw new Error("Elegí cómo registrar al enfermero.");
+  if (!["nuevo", "existente"].includes(values.pacienteMode))
+    throw new Error("Elegí cómo registrar al paciente.");
+
+  let operadorId = null;
+  let operador = null;
+  if (values.operadorMode === "existente") {
+    operadorId = registrationId(
+      values.operadorId,
+      "Seleccioná un enfermero registrado válido.",
+    );
+  } else {
+    const form = values.operador || {};
+    const nombre = registrationText(
+      form.nombre,
+      80,
+      "Ingresá el nombre del enfermero, de hasta 80 caracteres.",
+    );
+    const apellido = registrationText(
+      form.apellido,
+      80,
+      "Ingresá el apellido del enfermero, de hasta 80 caracteres.",
+    );
+    if (!["MAÑANA", "TARDE", "VESPERTINO"].includes(form.turno))
+      throw new Error("Seleccioná el turno del enfermero.");
+    operador = { nombre, apellido, turno: form.turno };
+  }
+
+  let pacienteId = null;
+  let paciente = null;
+  if (values.pacienteMode === "existente") {
+    pacienteId = registrationId(
+      values.pacienteId,
+      "Seleccioná un paciente registrado válido.",
+    );
+  } else {
+    const form = values.paciente || {};
+    const validated = validatePatient({
+      fecha_nacimiento: form.fechaNacimiento,
+      sexo: form.sexo,
+    });
+    paciente = {
+      fechaNacimiento: validated.fecha_nacimiento,
+      sexo: validated.sexo,
+    };
+  }
+
+  const supervisorId = registrationId(
+    values.supervisorId,
+    "Seleccioná un supervisor registrado válido.",
+    true,
+  );
+  const anthropometry = validateAnthropometry(values.antropometria || {});
+  const pressure = validatePressure(values.tomaPresion || {});
+  const questionnaire = normalizeQuestionnaire(values.cuestionario || {});
+
+  return {
+    idRegistro,
+    consent: true,
+    operadorId,
+    operador,
+    pacienteId,
+    paciente,
+    supervisorId,
+    antropometria: {
+      pesoKg: anthropometry.pesoKg,
+      tallacm: anthropometry.tallacm,
+      cinturacm: anthropometry.cinturacm,
+    },
+    tomaPresion: {
+      sistolicaMmHg: pressure.sistolicaMmHg,
+      diastolicaMmHg: pressure.diastolicaMmHg,
+    },
+    cuestionario: {
+      actividadFisica: questionnaire.actividadFisica,
+      frutasVerduras: questionnaire.frutasVerduras,
+      medicacion: questionnaire.medicacion,
+      tabaquismo: questionnaire.tabaquismo,
+      antecedenteFamiliar: questionnaire.antecedenteFamiliar,
+      tiposAntecedentes: questionnaire.tiposAntecedentes,
+    },
+  };
+}

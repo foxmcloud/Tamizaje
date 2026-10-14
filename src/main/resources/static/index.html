@@ -30,7 +30,7 @@
         >Ir al contenido principal</a
       >
       <aside class="workspace-sidebar">
-        <a class="brand" href="#inicio" @click.prevent="navigate('inicio')">
+        <a class="brand" href="#registro" @click.prevent="startDirectRegistration()">
           <span class="brand-icon" aria-hidden="true">♡</span>
           <span>Tamizaje<small>SALUD PREVENTIVA</small></span>
         </a>
@@ -90,19 +90,11 @@
               </p>
             </div>
             <button
-              v-if="!record"
+              v-if="!record && page !== 'registro'"
               type="button"
               class="btn btn-primary primary"
               :disabled="busy || loading"
-              @click="
-                openModal(
-                  page === 'pacientes'
-                    ? 'paciente'
-                    : page === 'equipo'
-                      ? 'enfermero'
-                      : 'tamizaje',
-                )
-              "
+              @click="page === 'pacientes' ? openModal('paciente') : page === 'equipo' ? openModal('enfermero') : startDirectRegistration()"
             >
               <span aria-hidden="true">＋</span>
               {{ page === "pacientes" ? "Nuevo paciente" : page === "equipo" ? "Agregar integrante" : "Nuevo tamizaje" }}
@@ -134,7 +126,305 @@
             ></button>
           </div>
 
-          <template v-if="!record">
+          <template v-if="!record && page === 'registro'">
+            <div class="direct-registration">
+              <p class="direct-intro alert alert-light border">
+                Completá los datos del enfermero, del paciente y sus controles en este mismo formulario. Al guardar se registra toda la atención y se calcula el resultado.
+              </p>
+              <div v-if="directError" class="alert alert-danger" role="alert">
+                {{ directError }}
+              </div>
+              <div v-if="directSaved" class="alert alert-success direct-saved" role="status">
+                Atención guardada. El resultado está al final de este formulario.
+              </div>
+              <form id="direct-registration-form" @submit.prevent="saveDirectRegistration()">
+                <fieldset class="direct-fields" :disabled="busy || Boolean(directSaved)">
+                  <legend class="visually-hidden">Registrar enfermero, paciente y control de tamizaje</legend>
+
+                  <section class="panel card direct-section" aria-labelledby="direct-nurse-heading">
+                    <div class="panel-head card-header">
+                      <div>
+                        <h2 id="direct-nurse-heading"><span class="direct-section-number" aria-hidden="true">1</span> Enfermero</h2>
+                        <p class="muted">Registrá al enfermero que realiza esta atención o seleccioná uno existente.</p>
+                      </div>
+                    </div>
+                    <div class="card-body detail-panel">
+                      <div class="d-flex flex-wrap gap-3 mb-4" role="group" aria-label="Enfermero nuevo o registrado">
+                        <div class="form-check">
+                          <input id="direct-nurse-new" v-model="directForm.operadorMode" class="form-check-input" type="radio" value="nuevo" name="direct-nurse-mode" />
+                          <label class="form-check-label" for="direct-nurse-new">Agregar enfermero</label>
+                        </div>
+                        <div class="form-check">
+                          <input id="direct-nurse-existing" v-model="directForm.operadorMode" class="form-check-input" type="radio" value="existente" name="direct-nurse-mode" />
+                          <label class="form-check-label" for="direct-nurse-existing">Usar enfermero registrado</label>
+                        </div>
+                      </div>
+                      <div v-if="directForm.operadorMode === 'nuevo'" class="row g-3">
+                        <div class="col-12 col-md-4">
+                          <label class="form-label" for="direct-nurse-name">Nombre del enfermero</label>
+                          <input id="direct-nurse-name" v-model="directForm.operador.nombre" class="form-control" type="text" maxlength="80" autocomplete="given-name" required />
+                        </div>
+                        <div class="col-12 col-md-4">
+                          <label class="form-label" for="direct-nurse-surname">Apellido del enfermero</label>
+                          <input id="direct-nurse-surname" v-model="directForm.operador.apellido" class="form-control" type="text" maxlength="80" autocomplete="family-name" required />
+                        </div>
+                        <div class="col-12 col-md-4">
+                          <label class="form-label" for="direct-nurse-shift">Turno</label>
+                          <select id="direct-nurse-shift" v-model="directForm.operador.turno" class="form-select" required>
+                            <option value="">Seleccionar…</option>
+                            <option v-for="option in shifts" :key="option.value" :value="option.value">{{ option.label }}</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div v-else>
+                        <p v-if="!operators.length" class="alert alert-warning">Todavía no hay enfermeros registrados. Elegí «Agregar enfermero» para continuar.</p>
+                        <label class="form-label" for="direct-nurse-selected">Enfermero responsable</label>
+                        <select id="direct-nurse-selected" v-model="directForm.operadorId" class="form-select" required>
+                          <option value="">Seleccionar enfermero…</option>
+                          <option v-for="member in operators" :key="member.id" :value="member.id">{{ member.nombre }} {{ member.apellido }} · {{ label(member.turno) }}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="panel card direct-section" aria-labelledby="direct-patient-heading">
+                    <div class="panel-head card-header">
+                      <div>
+                        <h2 id="direct-patient-heading"><span class="direct-section-number" aria-hidden="true">2</span> Paciente</h2>
+                        <p class="muted">Ingresá los datos del paciente que recibe el control.</p>
+                      </div>
+                    </div>
+                    <div class="card-body detail-panel">
+                      <div class="d-flex flex-wrap gap-3 mb-4" role="group" aria-label="Paciente nuevo o registrado">
+                        <div class="form-check">
+                          <input id="direct-patient-new" v-model="directForm.pacienteMode" class="form-check-input" type="radio" value="nuevo" name="direct-patient-mode" />
+                          <label class="form-check-label" for="direct-patient-new">Agregar paciente</label>
+                        </div>
+                        <div class="form-check">
+                          <input id="direct-patient-existing" v-model="directForm.pacienteMode" class="form-check-input" type="radio" value="existente" name="direct-patient-mode" />
+                          <label class="form-check-label" for="direct-patient-existing">Usar paciente registrado</label>
+                        </div>
+                      </div>
+                      <div v-if="directForm.pacienteMode === 'nuevo'" class="row g-3">
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-patient-birthdate">Fecha de nacimiento</label>
+                          <input id="direct-patient-birthdate" v-model="directForm.paciente.fechaNacimiento" class="form-control" type="date" required aria-describedby="direct-patient-age-help" />
+                          <p id="direct-patient-age-help" class="form-text mb-0">El paciente debe tener entre 14 y 120 años.</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-patient-sex">Sexo</label>
+                          <select id="direct-patient-sex" v-model="directForm.paciente.sexo" class="form-select" required>
+                            <option value="">Seleccionar…</option>
+                            <option v-for="option in sexes" :key="option.value" :value="option.value">{{ option.label }}</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div v-else>
+                        <p v-if="!patients.length" class="alert alert-warning">Todavía no hay pacientes registrados. Elegí «Agregar paciente» para continuar.</p>
+                        <label class="form-label" for="direct-patient-selected">Paciente que recibe la atención</label>
+                        <select id="direct-patient-selected" v-model="directForm.pacienteId" class="form-select" required>
+                          <option value="">Seleccionar paciente…</option>
+                          <option v-for="patient in patients" :key="patient.id_paciente" :value="patient.id_paciente">Paciente #{{ patient.id_paciente }} · {{ age(patient.fecha_nacimiento) }} años · {{ sexLabel(patient.sexo) }}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="panel card direct-section" aria-labelledby="direct-attention-heading">
+                    <div class="panel-head card-header">
+                      <div>
+                        <h2 id="direct-attention-heading"><span class="direct-section-number" aria-hidden="true">3</span> Datos de la atención</h2>
+                        <p class="muted">Confirmá el consentimiento del paciente antes de registrar los controles.</p>
+                      </div>
+                    </div>
+                    <div class="card-body detail-panel">
+                      <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-code">Identificador de registro</label>
+                          <input id="direct-code" v-model="directForm.idRegistro" class="form-control" type="text" maxlength="100" required />
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-supervisor">Supervisor (opcional)</label>
+                          <select id="direct-supervisor" v-model="directForm.supervisorId" class="form-select">
+                            <option value="">Sin supervisor</option>
+                            <option v-for="member in supervisors" :key="member.id" :value="member.id">{{ member.nombre }} {{ member.apellido }}</option>
+                          </select>
+                        </div>
+                        <div class="col-12">
+                          <div class="form-check direct-consent">
+                            <input id="direct-consent" v-model="directForm.consent" class="form-check-input" type="checkbox" required />
+                            <label class="form-check-label" for="direct-consent">El paciente acepta el consentimiento para la evaluación.</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="panel card direct-section" aria-labelledby="direct-anthropometry-heading">
+                    <div class="panel-head card-header">
+                      <div>
+                        <h2 id="direct-anthropometry-heading"><span class="direct-section-number" aria-hidden="true">4</span> Antropometría</h2>
+                        <p class="muted">Ingresá las medidas tomadas durante este control.</p>
+                      </div>
+                    </div>
+                    <div class="card-body detail-panel">
+                      <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                          <label class="form-label" for="direct-weight">Peso (kg)</label>
+                          <input id="direct-weight" v-model="directForm.antropometria.pesoKg" class="form-control" type="number" min="30" max="300" step="0.1" required />
+                        </div>
+                        <div class="col-12 col-md-4">
+                          <label class="form-label" for="direct-height">Talla (cm)</label>
+                          <input id="direct-height" v-model="directForm.antropometria.tallacm" class="form-control" type="number" min="120" max="220" step="0.1" required />
+                        </div>
+                        <div class="col-12 col-md-4">
+                          <label class="form-label" for="direct-waist">Cintura (cm)</label>
+                          <input id="direct-waist" v-model="directForm.antropometria.cinturacm" class="form-control" type="number" min="1" max="300" step="0.1" required />
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="panel card direct-section" aria-labelledby="direct-pressure-heading">
+                    <div class="panel-head card-header">
+                      <div>
+                        <h2 id="direct-pressure-heading"><span class="direct-section-number" aria-hidden="true">5</span> Presión arterial</h2>
+                        <p class="muted">Registrá la toma de presión arterial del paciente.</p>
+                      </div>
+                    </div>
+                    <div class="card-body detail-panel">
+                      <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-systolic">Sistólica (mmHg)</label>
+                          <input id="direct-systolic" v-model="directForm.tomaPresion.sistolicaMmHg" class="form-control" type="number" min="70" max="260" step="1" required />
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-diastolic">Diastólica (mmHg)</label>
+                          <input id="direct-diastolic" v-model="directForm.tomaPresion.diastolicaMmHg" class="form-control" type="number" min="40" max="150" step="1" required />
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="panel card direct-section" aria-labelledby="direct-questionnaire-heading">
+                    <div class="panel-head card-header">
+                      <div>
+                        <h2 id="direct-questionnaire-heading"><span class="direct-section-number" aria-hidden="true">6</span> Hábitos y antecedentes</h2>
+                        <p class="muted">Completá el cuestionario junto al paciente.</p>
+                      </div>
+                    </div>
+                    <div class="card-body detail-panel">
+                      <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-activity">¿Realiza actividad física diariamente?</label>
+                          <select id="direct-activity" v-model="directForm.cuestionario.actividadFisica" class="form-select" required>
+                            <option value="">Seleccionar…</option><option value="true">Sí</option><option value="false">No</option>
+                          </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-fruit">¿Consume frutas y verduras diariamente?</label>
+                          <select id="direct-fruit" v-model="directForm.cuestionario.frutasVerduras" class="form-select" required>
+                            <option value="">Seleccionar…</option><option value="true">Sí</option><option value="false">No</option>
+                          </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-medication">¿Toma medicación para la hipertensión?</label>
+                          <select id="direct-medication" v-model="directForm.cuestionario.medicacion" class="form-select" required>
+                            <option value="">Seleccionar…</option><option value="true">Sí</option><option value="false">No</option>
+                          </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-tobacco">Tabaquismo</label>
+                          <select id="direct-tobacco" v-model="directForm.cuestionario.tabaquismo" class="form-select" required>
+                            <option value="">Seleccionar…</option>
+                            <option v-for="option in tobacco" :key="option.value" :value="option.value">{{ option.label }}</option>
+                          </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <label class="form-label" for="direct-family">Antecedentes familiares</label>
+                          <select id="direct-family" v-model="directForm.cuestionario.antecedenteFamiliar" class="form-select" required>
+                            <option value="">Seleccionar…</option>
+                            <option v-for="option in families" :key="option.value" :value="option.value">{{ option.label }}</option>
+                          </select>
+                        </div>
+                        <fieldset v-if="directForm.cuestionario.antecedenteFamiliar && directForm.cuestionario.antecedenteFamiliar !== 'NO'" class="col-12 antecedent-types">
+                          <legend>Tipos de antecedentes (seleccioná al menos uno)</legend>
+                          <div v-for="(option, index) in antecedentTypes" :key="option.value" class="form-check mb-2">
+                            <input :id="'direct-antecedent-' + option.value" v-model="directForm.cuestionario.tiposAntecedentes" class="form-check-input" type="checkbox" :value="option.value" :required="index === 0 && directForm.cuestionario.tiposAntecedentes.length === 0" />
+                            <label class="form-check-label" :for="'direct-antecedent-' + option.value">{{ option.label }}</label>
+                          </div>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </section>
+                </fieldset>
+                <div v-if="!directSaved" class="direct-submit d-flex flex-wrap align-items-center justify-content-between gap-3">
+                  <p class="muted m-0">Todos los datos se guardan juntos al finalizar la atención.</p>
+                  <button type="submit" class="btn btn-primary primary" :disabled="busy || loading || Boolean(loadError)">
+                    <span v-if="busy" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    {{ busy ? 'Guardando atención…' : 'Guardar atención y calcular resultado' }}
+                  </button>
+                </div>
+              </form>
+
+              <article v-if="directResult" id="direct-result" class="result panel card mt-4" aria-labelledby="direct-result-heading" tabindex="-1">
+                <div class="card-body direct-result-body">
+                  <div class="result-heading">
+                    <div>
+                      <p class="eyebrow">ATENCIÓN REGISTRADA</p>
+                      <h2 id="direct-result-heading">Resultado de la evaluación</h2>
+                      <p class="muted">Registro {{ directSaved.tamizaje.id_registro }}</p>
+                    </div>
+                    <span class="badge status-badge" :class="badgeClass(directResult.semaforoGlobal)">{{ label(directResult.semaforoGlobal) }}</span>
+                  </div>
+                  <dl class="answers direct-attribution">
+                    <div><dt>Enfermero responsable</dt><dd>{{ directSaved.operador.nombre }} {{ directSaved.operador.apellido }}</dd></div>
+                    <div><dt>Paciente</dt><dd>#{{ directSaved.paciente.id_paciente }} · {{ age(directSaved.paciente.fecha_nacimiento) }} años · {{ sexLabel(directSaved.paciente.sexo) }}</dd></div>
+                    <div><dt>Consentimiento</dt><dd>Aceptado</dd></div>
+                    <div><dt>Medidas</dt><dd>{{ directSaved.antropometria.pesoKg }} kg · {{ directSaved.antropometria.tallacm }} cm de talla · {{ directSaved.antropometria.cinturacm }} cm de cintura</dd></div>
+                    <div><dt>Presión arterial</dt><dd>{{ directSaved.tomaPresion.sistolicaMmHg }} / {{ directSaved.tomaPresion.diastolicaMmHg }} mmHg</dd></div>
+                  </dl>
+                  <div class="alert alert-info result-method">
+                    El servidor aplica una variante de FINDRISC que no incorpora cintura ni antecedentes de glucosa elevada al puntaje. El informe orienta la evaluación y debe ser interpretado por el profesional de salud.
+                  </div>
+                  <div v-if="directResult.derivacionInmediata" class="alert alert-danger immediate-referral" role="alert">
+                    <strong>Derivación inmediata.</strong> Avisar al docente o profesional responsable.
+                  </div>
+                  <div class="stats compact row g-3">
+                    <div class="col-12 col-md-4">
+                      <div class="stat card h-100"><div class="card-body">
+                        <h3 class="stat-label">FINDRISC</h3>
+                        <strong>{{ directResult.puntajeFindrisc }}</strong><small>{{ label(directResult.categoriaFindrisc) }}</small>
+                      </div></div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <div class="stat card h-100"><div class="card-body">
+                        <h3 class="stat-label">Riesgo cardiovascular</h3>
+                        <strong class="smaller">{{ label(directResult.riesgoCardiovascular) }}</strong>
+                        <span class="badge status-badge" :class="badgeClass(directResult.semaforoRiesgoCardiovascular)">{{ label(directResult.semaforoRiesgoCardiovascular) }}</span>
+                      </div></div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <div class="stat card h-100"><div class="card-body">
+                        <h3 class="stat-label">IMC y presión arterial</h3>
+                        <p class="mb-2">IMC: <strong v-if="directSaved.antropometria.imc != null">{{ Number(directSaved.antropometria.imc).toFixed(1) }}</strong> <span class="badge status-badge" :class="badgeClass(directResult.semaforoImc)">{{ label(directResult.semaforoImc) }}</span></p>
+                        <p class="mb-0">Presión: <span class="badge status-badge" :class="badgeClass(directResult.semaforoPresion)">{{ label(directResult.semaforoPresion) }}</span></p>
+                      </div></div>
+                    </div>
+                  </div>
+                  <p v-if="directResult.observaciones" class="result-observations">{{ directResult.observaciones }}</p>
+                  <p class="mt-3">Derivación: <strong>{{ directResult.deriva ? 'Sí' : 'No' }}</strong></p>
+                  <div class="d-flex flex-wrap gap-2 direct-result-actions">
+                    <button type="button" class="btn btn-outline-primary print-button" :disabled="busy" @click="printDirectResult()">Imprimir informe</button>
+                    <button type="button" class="btn btn-outline-secondary" :disabled="busy" @click="openRecord(directSaved.tamizaje)">Abrir ficha</button>
+                    <button type="button" class="btn btn-primary primary" :disabled="busy" @click="startDirectRegistration()">Nueva atención</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </template>
+
+          <template v-else-if="!record">
             <template v-if="page === 'inicio'">
               <div class="stats row g-3">
                 <div class="col-12 col-md-4">
@@ -182,7 +472,7 @@
                     type="button"
                     class="btn btn-outline-primary"
                     :disabled="loading || busy"
-                    @click="openModal('tamizaje')"
+                    @click="startDirectRegistration()"
                   >
                     Iniciar una evaluación <span aria-hidden="true">↗</span>
                   </button>
@@ -543,7 +833,7 @@
                         </div>
                       </div>
                       <div
-                        v-if="anthropometry.cinturacm != null"
+                        v-if="anthropometry.cinturacm > 0"
                         class="col-6 col-lg-3"
                       >
                         <div class="stat card h-100">

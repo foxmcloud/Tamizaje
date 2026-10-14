@@ -19,11 +19,39 @@ import {
   validatePressure,
   validateAnthropometry,
   normalizeQuestionnaire,
+  buildDirectRegistrationPayload,
 } from "./api.js";
+
+function freshDirectForm() {
+  const suffix =
+    globalThis.crypto?.randomUUID?.().slice(0, 8) ||
+    Math.random().toString(36).slice(2, 10);
+  return {
+    operadorMode: "nuevo",
+    operadorId: "",
+    operador: { nombre: "", apellido: "", turno: "" },
+    pacienteMode: "nuevo",
+    pacienteId: "",
+    paciente: { fechaNacimiento: "", sexo: "" },
+    idRegistro: `TAM-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${suffix.toUpperCase()}`,
+    consent: false,
+    supervisorId: "",
+    antropometria: { pesoKg: "", tallacm: "", cinturacm: "" },
+    tomaPresion: { sistolicaMmHg: "", diastolicaMmHg: "" },
+    cuestionario: {
+      actividadFisica: "",
+      frutasVerduras: "",
+      medicacion: "",
+      tabaquismo: "",
+      antecedenteFamiliar: "",
+      tiposAntecedentes: [],
+    },
+  };
+}
 
 createApp({
   setup() {
-    const page = ref("inicio"),
+    const page = ref("registro"),
       query = ref(""),
       loading = ref(true),
       loadError = ref(""),
@@ -44,6 +72,11 @@ createApp({
       result = ref(null);
     const editingPressure = ref(null),
       resultOutdated = ref(false);
+    const directForm = reactive(freshDirectForm());
+    const directError = ref("");
+    const directSaved = ref(null);
+    const directResult = computed(() => directSaved.value?.resultado || null);
+    const directMode = computed(() => page.value === "registro");
     const patientForm = reactive({ fecha_nacimiento: "", sexo: "" });
     const staffForm = reactive({
       nombre: "",
@@ -69,6 +102,7 @@ createApp({
       tiposAntecedentes: [],
     });
     const sections = [
+      { key: "registro", title: "Registro directo", icon: "＋" },
       { key: "inicio", title: "Resumen", icon: "◈" },
       { key: "tamizajes", title: "Tamizajes", icon: "▤" },
       { key: "pacientes", title: "Pacientes", icon: "♧" },
@@ -122,6 +156,7 @@ createApp({
       record.value
         ? "Ficha de tamizaje"
         : {
+            registro: "Registrar atención",
             inicio: "Una mirada a la salud de tu comunidad",
             pacientes: "Pacientes",
             equipo: "Equipo de salud",
@@ -131,7 +166,9 @@ createApp({
     const pageDescription = computed(() =>
       record.value
         ? `Registro ${record.value.id_registro}`
-        : "Registrá, evaluá y acompañá cada paso de la atención.",
+        : page.value === "registro"
+          ? "Agregá el enfermero, el paciente y sus controles en un solo formulario."
+          : "Registrá, evaluá y acompañá cada paso de la atención.",
     );
     const modalTitle = computed(
       () =>
@@ -154,6 +191,62 @@ createApp({
     let registrationModal, launcher;
     let reloadVersion = 0;
 
+    function resetDirectRegistration() {
+      const previousOperator = directSaved.value?.operador?.id;
+      Object.assign(directForm, freshDirectForm());
+      if (
+        previousOperator &&
+        operators.value.some((person) => person.id === previousOperator)
+      ) {
+        directForm.operadorMode = "existente";
+        directForm.operadorId = String(previousOperator);
+      }
+      directSaved.value = null;
+      directError.value = "";
+    }
+    function startDirectRegistration() {
+      if (busy.value) return;
+      resetDirectRegistration();
+      notice.value = "";
+      navigate("registro");
+      nextTick(() =>
+        document
+          .getElementById(
+            directForm.operadorMode === "existente"
+              ? "direct-patient-birthdate"
+              : "direct-nurse-name",
+          )
+          ?.focus(),
+      );
+    }
+    async function saveDirectRegistration() {
+      if (busy.value || directSaved.value) return;
+      busy.value = true;
+      directError.value = "";
+      try {
+        const body = buildDirectRegistrationPayload(directForm);
+        const saved = await request("/tamizajes/completo", {
+          method: "POST",
+          body,
+        });
+        directSaved.value = saved;
+        notice.value =
+          "Atención guardada. Enfermero, paciente y controles quedaron vinculados correctamente.";
+        setRoute("registro");
+        await reload();
+        await nextTick();
+        document
+          .getElementById("direct-result")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (error) {
+        directError.value = error.message;
+      } finally {
+        busy.value = false;
+      }
+    }
+    function printDirectResult() {
+      if (directResult.value) window.print();
+    }
     function setRoute(hash) {
       window.history.replaceState(
         null,
@@ -192,6 +285,10 @@ createApp({
     }
     async function openModal(kind) {
       if (busy.value) return;
+      if (kind === "tamizaje") {
+        startDirectRegistration();
+        return;
+      }
       launcher = document.activeElement;
       formError.value = "";
       modalKind.value = kind;
@@ -364,6 +461,8 @@ createApp({
           );
         requireConsent();
         await operation();
+        if (directSaved.value?.tamizaje.id === record.value.id)
+          resetDirectRegistration();
         resultOutdated.value = Boolean(result.value);
         await loadRecord();
         notice.value = message;
@@ -446,6 +545,8 @@ createApp({
           `/tamizajes/${record.value.id}/resultado`,
           { method: "POST" },
         );
+        if (directSaved.value?.tamizaje.id === record.value.id)
+          resetDirectRegistration();
         resultOutdated.value = false;
       } catch (error) {
         formError.value = error.message;
@@ -468,6 +569,12 @@ createApp({
       () => questionForm.antecedenteFamiliar,
       (value) => {
         if (value === "NO") questionForm.tiposAntecedentes = [];
+      },
+    );
+    watch(
+      () => directForm.cuestionario.antecedenteFamiliar,
+      (value) => {
+        if (value === "NO") directForm.cuestionario.tiposAntecedentes = [];
       },
     );
     onMounted(async () => {
@@ -498,6 +605,14 @@ createApp({
     });
     return {
       page,
+      directForm,
+      directError,
+      directSaved,
+      directResult,
+      directMode,
+      startDirectRegistration,
+      saveDirectRegistration,
+      printDirectResult,
       query,
       loading,
       loadError,

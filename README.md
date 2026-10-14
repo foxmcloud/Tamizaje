@@ -33,12 +33,16 @@ Sin el perfil `demo`, se conserva la conexión definida en `src/main/resources/a
 
 ## Flujo de prueba
 
-1. En **Pacientes**, registrá fecha de nacimiento y sexo (edad entre 14 y 120 años).
-2. En **Equipo de salud**, agregá un profesional con rol Enfermero. El supervisor es opcional.
-3. Creá un **Tamizaje** con identificador único, paciente, operador y consentimiento explícito.
-4. Guardá antropometría, una o más tomas de presión y el cuestionario.
-5. Calculá el resultado. Podés editar/eliminar tomas, recalcular e imprimir el informe.
-6. Recargá la página: el identificador de ficha en el fragmento de URL permite reabrirla, y los controles se recuperan de la API.
+La pantalla inicial **Registro directo** permite completar toda la atención en un solo formulario:
+
+1. Agregá el enfermero (nombre, apellido y turno), o elegí uno registrado.
+2. Agregá el paciente (fecha de nacimiento y sexo), o elegí uno registrado.
+3. Confirmá el código de ficha y el consentimiento. El supervisor es opcional.
+4. Ingresá antropometría, presión y las respuestas del cuestionario, sin cambiar de pestaña o pantalla.
+5. Presioná **Guardar atención y calcular resultado**. El enfermero, el paciente, la ficha, los controles y el resultado se guardan juntos en una transacción. Si hay un error, no quedan altas parciales y el formulario conserva sus datos para corregirlos.
+6. Revisá e imprimí el resultado en esa misma pantalla. **Nueva atención** permite continuar con otro paciente reutilizando el enfermero recién registrado.
+
+Los listados anteriores permiten consultar registros y abrir fichas para agregar/editar/eliminar tomas, recalcular e imprimir resultados. La ficha se puede reabrir al recargar usando su identificador en el fragmento de URL.
 
 La API original permite crear y consultar antropometría/cuestionario, sin edición; los registros existentes se muestran como solo lectura para evitar duplicados. El resultado es un cálculo guardado: recalculá después de cambiar controles. FINDRISC mantiene la variante del backend sin cintura ni glucemia previa. La aplicación aún no incluye autenticación.
 
@@ -52,13 +56,13 @@ La API original permite crear y consultar antropometría/cuestionario, sin edici
 
 ```sh
 # Integración web y perfil demo, sin necesitar MySQL
-bash gradlew test --tests cent35.WebUiIntegrationTests
+bash gradlew test --tests cent35.WebUiIntegrationTests --tests cent35.TamizajeCompletoIntegrationTests
 
 # Toda la suite Java; la prueba original de contexto usa MySQL por defecto
 bash gradlew test
 
 # Validadores JavaScript (opcional; Node.js 18+, sin npm install)
-node --test src/test/js/api.test.mjs
+node --test src/test/js/*.test.mjs
 ```
 
 En desarrollo, `bootRun` ya usa `sourceResources`: se editan los archivos estáticos y se recarga el navegador. Para distribuir cambios, reconstruí el JAR.

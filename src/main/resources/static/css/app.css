@@ -463,6 +463,49 @@
   margin: 0;
   text-align: right;
 }
+.direct-fields {
+  min-width: 0;
+}
+.direct-section {
+  margin-bottom: 1.25rem;
+}
+.direct-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.direct-section-number {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #eaf3ee;
+  color: #245c49;
+  font-size: 0.85rem;
+}
+.direct-section .form-check-label {
+  cursor: pointer;
+}
+.direct-fields:disabled .form-check-label {
+  cursor: default;
+}
+.direct-consent {
+  margin-top: 0.5rem;
+}
+.direct-submit {
+  padding: 0.5rem 0 1rem;
+}
+.direct-result-body {
+  padding: 1.75rem;
+}
+.direct-attribution {
+  margin-bottom: 1.5rem;
+}
+.direct-result-actions {
+  margin-top: 1.5rem;
+}
 
 @media (max-width: 1100px) {
   .workspace-sidebar {
@@ -569,7 +612,8 @@
     display: none;
   }
   .panel-head,
-  .detail-panel {
+  .detail-panel,
+  .direct-result-body {
     padding: 1.25rem;
   }
   .tools {
@@ -635,6 +679,15 @@
   }
   .result .alert {
     display: block !important;
+  }
+  .direct-registration > :not(.result) {
+    display: none !important;
+  }
+  .direct-result-body {
+    padding: 0;
+  }
+  .direct-result-actions {
+    display: none !important;
   }
   .result .stats > div {
     flex: 0 0 auto;

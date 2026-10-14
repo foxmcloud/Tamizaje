@@ -5,7 +5,7 @@ import cent35.models.ResultadosTamizaje;
 import cent35.models.Tamizaje;
 import cent35.repositories.ResultadosTamizajeRepository;
 import cent35.repositories.TamizajeRepository;
-import cent35.services.FindriscService;
+import cent35.services.ResultadoTamizajeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.*;
 public class ResultadoTamizajeController {
     private final TamizajeRepository tamizajeRepository;
     private final ResultadosTamizajeRepository resultadosRepository;
-    private final FindriscService findriscService;
+    private final ResultadoTamizajeService resultadoService;
 
     public ResultadoTamizajeController(TamizajeRepository tamizajeRepository,
                                        ResultadosTamizajeRepository resultadosRepository,
-                                       FindriscService findriscService) {
+                                       ResultadoTamizajeService resultadoService) {
         this.tamizajeRepository = tamizajeRepository;
         this.resultadosRepository = resultadosRepository;
-        this.findriscService = findriscService;
+        this.resultadoService = resultadoService;
     }
 
     @PostMapping("/{idTamizaje}/resultado")
@@ -37,26 +37,11 @@ public class ResultadoTamizajeController {
             return ResponseEntity.badRequest().body("El tamizaje no tiene todos los controles validos");
         }
 
-        Integer puntaje = findriscService.calcularPuntaje(tamizaje);
-        if (puntaje == null) return ResponseEntity.badRequest().body("No se pudo calcular FINDRISC");
-
         ResultadosTamizaje resultado = resultadosRepository.findByTamizajeId(idTamizaje)
                 .orElseGet(ResultadosTamizaje::new);
-        resultado.setTamizaje(tamizaje);
-        resultado.setPuntaje_findrisc(puntaje);
-        resultado.setCategoria_findrisc(findriscService.clasificarPuntaje(puntaje));
-        resultado.setSemaforo_imc(tamizaje.clasificarIMC());
-        resultado.setSemaforo_presion(tamizaje.clasificarPresion());
-        resultado.setRiesgo_cv(tamizaje.calcularRiesgoCardiovascularSimplificado());
-        resultado.setSemaforo_riesgo_cv(tamizaje.clasificarRiesgoCardiovascularSimplificado());
-        resultado.setDerivacionInmediata(tamizaje.requiereDerivacionInmediata());
-        resultado.setSemaforo_global(tamizaje.calcularSemaforoGlobal(puntaje));
-        resultado.setDeriva(tamizaje.requiereDerivacion(puntaje) || resultado.isDerivacionInmediata());
-        resultado.setObservaciones(resultado.isDerivacionInmediata()
-                ? "Derivacion inmediata y aviso al docente responsable."
-                : resultado.isDeriva() ? "Recomendar consulta con un centro de salud."
-                : "Mantener habitos saludables.");
-        tamizaje.setResultados(resultado);
+        if (resultadoService.calcular(tamizaje, resultado) == null) {
+            return ResponseEntity.badRequest().body("No se pudo calcular FINDRISC");
+        }
         ResultadosTamizaje guardado = resultadosRepository.save(resultado);
         return ResponseEntity.ok(new ResultadosTamizajeDTO(guardado));
     }
