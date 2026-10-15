@@ -1,0 +1,55 @@
+@page {
+  size: A4;
+  margin: 19mm 16mm 20mm;
+  @top-left { content: "TAMIZAJE / DOCUMENTACIÓN DEL PROYECTO"; font: 7.5pt Arial, sans-serif; color: #648078; }
+  @bottom-left { content: "Código de referencia: 9ddfda5 · 15/10/2026"; font: 7.5pt Arial, sans-serif; color: #648078; }
+  @bottom-right { content: counter(page) " / " counter(pages); font: 8pt Arial, sans-serif; color: #255e51; }
+}
+@page :first {
+  @top-left { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+* { box-sizing: border-box; }
+html { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 9pt; color: #243a34; }
+body { margin: 0; padding: 0; max-width: none; font-size: 9pt; line-height: 1.53; }
+p { margin: 0 0 9pt; orphans: 3; widows: 3; }
+h1, h2, h3, h4 { color: #175d4d; break-after: avoid; line-height: 1.25; }
+h1 { font-size: 22pt; margin: 0 0 15pt; padding-bottom: 9pt; border-bottom: 2pt solid #1a7964; break-before: page; }
+h2 { font-size: 14pt; margin: 18pt 0 9pt; }
+h3 { font-size: 10.8pt; margin: 14pt 0 7pt; }
+h4 { font-size: 9.5pt; margin: 10pt 0 5pt; }
+a { color: #176c99; text-decoration: none; overflow-wrap: anywhere; }
+strong { font-weight: 700; }
+ul, ol { margin: 5pt 0 10pt; padding-left: 17pt; }
+li { margin-bottom: 4pt; }
+li > p { margin-bottom: 3pt; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; overflow-wrap: anywhere; }
+pre { padding: 10pt 11pt; background: #f0f5f3; border-left: 2pt solid #559581; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; line-height: 1.43; margin: 9pt 0 12pt; }
+pre code { font-size: 7.7pt; }
+table { width: 100%; border-collapse: collapse; margin: 9pt 0 13pt; font-size: 8pt; table-layout: fixed; }
+thead { display: table-header-group; }
+th { background: #e6f0ec; color: #174e40; font-weight: 700; }
+td, th { padding: 6.5pt 7pt; border: 0.5pt solid #cfddd7; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+tr { break-inside: avoid; }
+td p { margin: 0; }
+table code { font-size: 7.2pt; }
+blockquote { margin: 10pt 0; padding: 9pt 12pt; border-left: 3pt solid #bc9c3b; background: #fcf9ee; break-inside: avoid; }
+blockquote p:last-child { margin-bottom: 0; }
+.cover { min-height: 232mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
+.cover h1 { font-size: 37pt; border: none; padding: 0; margin: 22pt 0; break-before: avoid; color: #164d40; line-height: 1.15; }
+.kicker { font-size: 10pt; font-weight: 700; letter-spacing: 2pt; color: #4c7c6e; }
+.cover .subtitle { font-size: 16pt; max-width: 135mm; color: #4f6b62; line-height: 1.5; }
+.cover-rule { width: 40mm; border-top: 4pt solid #2e8b73; margin: 23pt 0; }
+.cover .edition { font-size: 10pt; color: #5d746a; margin-top: 30pt; }
+#TOC { break-after: page; padding-top: 6mm; }
+#TOC::before { content: "Índice navegable"; display: block; color: #175d4d; font-size: 24pt; font-weight: 700; margin-bottom: 18pt; }
+#TOC > ul { padding: 0; list-style: none; }
+#TOC > ul > li { margin: 10pt 0; font-weight: 700; }
+#TOC li ul { margin: 4pt 0; font-weight: 400; }
+#TOC li ul li { margin-bottom: 3pt; font-size: 8.5pt; }
+.architecture { width: 100%; height: auto; margin: 12pt 0; }
+.file-catalog td:first-child { width: 49%; }
+.file-catalog td:last-child { width: 51%; }
+.file-catalog td { font-size: 7.7pt; }
+.file-catalog code { font-size: 7pt; }

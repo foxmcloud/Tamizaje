@@ -71,3 +71,9 @@ node --test src/test/js/*.test.mjs
 ```
 
 En desarrollo, `bootRun` ya usa `sourceResources`: se editan los archivos estáticos y se recarga el navegador. Para distribuir cambios, reconstruí el JAR.
+
+## Documentación integral
+
+[Descargar el manual completo en PDF](https://github.com/foxmcloud/Tamizaje/raw/refs/heads/codex/vue-bootstrap-springboot/docs/Tamizaje-documentacion-integral.pdf): funcionamiento, ramas, instalación, arquitectura, API, reglas de cálculo y responsabilidad de cada archivo.
+
+La [fuente editable](docs/documentacion-integral.md) y el [inventario de archivos](docs/inventario-archivos.json) están en `docs/`. Para regenerar el PDF se usa `python3 docs/generar_pdf.py`, con Pandoc, Chromium/Chrome y el paquete Python Playwright instalados (`python3 -m pip install playwright`). Estas herramientas se necesitan sólo para generar el manual.

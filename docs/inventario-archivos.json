@@ -1,0 +1,1498 @@
+{
+  "fecha_revision": "2026-10-15",
+  "zona_horaria_fecha": "America/Argentina/Buenos_Aires",
+  "codigo_vue_referencia": "9ddfda591a779e94cbc7f9aecebefc9f35954e1f",
+  "alcance": "139 rutas únicas versionadas de código/artefactos en cuatro ramas; cinco archivos nuevos de documentación. No incluye .git, dependencias descargadas ni datos locales.",
+  "ramas": [
+    {
+      "codigo": "M",
+      "ref": "origin/main",
+      "commit": "f85d9f1086df12984abeea694c2accb898894164",
+      "cantidad_archivos_snapshot": 100
+    },
+    {
+      "codigo": "R",
+      "ref": "codex/react-frontend-tamizaje",
+      "commit": "6bc8f3809bc2c7bb0ec7be093a7b05e14fb3f757",
+      "cantidad_archivos_snapshot": 112
+    },
+    {
+      "codigo": "D",
+      "ref": "codex/tamizaje-bootstrap-demo",
+      "commit": "470c5bdb1e2c45fcb0eb92ec8379582734f176b3",
+      "cantidad_archivos_snapshot": 115
+    },
+    {
+      "codigo": "V",
+      "ref": "codex/vue-bootstrap-springboot",
+      "commit": "9ddfda591a779e94cbc7f9aecebefc9f35954e1f",
+      "cantidad_archivos_snapshot": 124
+    }
+  ],
+  "archivos": [
+    {
+      "ruta": ".gitignore",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Excluye caché Gradle, nuevas salidas build/, datos locales H2 y logs en la rama Vue. No elimina los artefactos build/ que ya estaban versionados. La rama React utiliza su propia selección de exclusiones."
+    },
+    {
+      "ruta": ".prettierignore",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Conserva el formato original y hashes de vendor/. Excluye index.html del formateador genérico: una interpolación Vue con un literal de texto no debe romperse en varias líneas."
+    },
+    {
+      "ruta": "HELP.md",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Ayuda inicial generada por Spring Initializr con enlaces generales. Algunos vínculos apuntan a Spring Boot 4.1.1; la versión real del proyecto es la 2.7.14 definida en build.gradle."
+    },
+    {
+      "ruta": "README.md",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Guía de uso de la rama Vue integrada: requisitos, arranque con H2 demo o MySQL, JAR único, flujo de siete pasos, consulta y recálculo de fichas, limitaciones de cálculo/autenticación y comandos de pruebas."
+    },
+    {
+      "ruta": "build.gradle",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Define proyecto Java/Spring Boot 2.7.14, compatibilidad de fuentes 11, dependencias web/JPA/DataREST/MySQL/H2, recursos de bootRun y tareas de pruebas JUnit Platform/bootJar."
+    },
+    {
+      "ruta": "build/bootRunMainClassName",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Salida de la tarea Gradle que registró la clase principal de bootRun en una compilación anterior; se regenera y no define por sí sola la configuración fuente."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/TamizajeApplication.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TamizajeApplication.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/controllers/AntropometriaController.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de AntropometriaController.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/controllers/CuestionarioController.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de CuestionarioController.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/controllers/EnfermeroController.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de EnfermeroController.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/controllers/PacienteController.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de PacienteController.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/controllers/ResultadoTamizajeController.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de ResultadoTamizajeController.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/controllers/TamizajeController.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TamizajeController.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/controllers/TomaPresionController.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TomaPresionController.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/dtos/AntropometriaDTO.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de AntropometriaDTO.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/dtos/CuestionarioDTO.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de CuestionarioDTO.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/dtos/EnfermeroDTO.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de EnfermeroDTO.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/dtos/PacienteDTO.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de PacienteDTO.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/dtos/ResultadosTamizajeDTO.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de ResultadosTamizajeDTO.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/dtos/TamizajeDTO.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TamizajeDTO.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/dtos/TomaPresionDTO.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TomaPresionDTO.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/Antropometria.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Antropometria.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/Control.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Control.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/Cuestionario.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Cuestionario.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/Enfermero.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Enfermero.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/Paciente.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Paciente.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/ResultadosTamizaje.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de ResultadosTamizaje.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/Tamizaje.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Tamizaje.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/TomaPresion.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TomaPresion.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/enums/AntecedentesFamiliares.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de AntecedentesFamiliares.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/enums/RolEnfermero.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de RolEnfermero.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/enums/SemaforoGlobal.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de SemaforoGlobal.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/enums/Sexo.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Sexo.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/enums/Tabaquismo.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Tabaquismo.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/enums/TipoAntecedente.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TipoAntecedente.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/models/enums/Turnos.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de Turnos.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/repositories/AntropometriaRepository.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de AntropometriaRepository.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/repositories/CuestionarioRepository.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de CuestionarioRepository.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/repositories/EnfermeroRepository.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de EnfermeroRepository.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/repositories/PacienteRepository.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de PacienteRepository.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/repositories/ResultadosTamizajeRepository.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de ResultadosTamizajeRepository.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/repositories/TamizajeRepository.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TamizajeRepository.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/repositories/TomaPresionRepository.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TomaPresionRepository.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/main/cent35/services/FindriscService.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de FindriscService.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/classes/java/test/com/example/tamizaje/TamizajeApplicationTests.class",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Bytecode Java heredado de TamizajeApplicationTests.class, generado al compilar su fuente del mismo nombre. No se edita ni se toma como referencia del código actual; puede estar desactualizado respecto de src/."
+    },
+    {
+      "ruta": "build/reports/tests/test/classes/com.example.tamizaje.TamizajeApplicationTests.html",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Página HTML generada de un paquete o clase de la prueba original. Describe una ejecución histórica y no certifica el estado actual de las pruebas."
+    },
+    {
+      "ruta": "build/reports/tests/test/css/base-style.css",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Estilos del informe HTML generado de pruebas Gradle. No son estilos del frontend React ni Vue."
+    },
+    {
+      "ruta": "build/reports/tests/test/css/style.css",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Estilos del informe HTML generado de pruebas Gradle. No son estilos del frontend React ni Vue."
+    },
+    {
+      "ruta": "build/reports/tests/test/index.html",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Índice HTML generado de un informe histórico de pruebas Gradle. Sirve para navegar los resultados de esa ejecución, no para iniciar la interfaz del proyecto."
+    },
+    {
+      "ruta": "build/reports/tests/test/js/report.js",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "JavaScript de navegación y presentación del informe HTML generado de pruebas Gradle. No contiene lógica del sistema de tamizaje."
+    },
+    {
+      "ruta": "build/reports/tests/test/packages/com.example.tamizaje.html",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Página HTML generada de un paquete o clase de la prueba original. Describe una ejecución histórica y no certifica el estado actual de las pruebas."
+    },
+    {
+      "ruta": "build/resources/main/application.properties",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Copia procesada de la configuración base incluida en una compilación anterior. La configuración editable es src/main/resources/application.properties; esta copia puede estar desactualizada."
+    },
+    {
+      "ruta": "build/test-results/test/TEST-com.example.tamizaje.TamizajeApplicationTests.xml",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Resultado JUnit XML de una ejecución histórica de la prueba de contexto original. Lo consumen herramientas de informes; debe regenerarse para conocer un resultado actual."
+    },
+    {
+      "ruta": "build/test-results/test/binary/output.bin",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Datos o índice binario interno de resultados de pruebas Gradle (salida de consola y eventos). Se regeneran al ejecutar test; no se editan manualmente."
+    },
+    {
+      "ruta": "build/test-results/test/binary/output.bin.idx",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Datos o índice binario interno de resultados de pruebas Gradle (salida de consola y eventos). Se regeneran al ejecutar test; no se editan manualmente."
+    },
+    {
+      "ruta": "build/test-results/test/binary/results.bin",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Datos o índice binario interno de resultados de pruebas Gradle (salida de consola y eventos). Se regeneran al ejecutar test; no se editan manualmente."
+    },
+    {
+      "ruta": "build/tmp/compileJava/previous-compilation-data.bin",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Metadatos binarios internos de compilación incremental de Gradle. Son caché regenerable de una compilación anterior, no código fuente ni datos de pacientes."
+    },
+    {
+      "ruta": "build/tmp/compileTestJava/previous-compilation-data.bin",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "generado heredado",
+      "responsabilidad": "Metadatos binarios internos de compilación incremental de Gradle. Son caché regenerable de una compilación anterior, no código fuente ni datos de pacientes."
+    },
+    {
+      "ruta": "distribucion/README.md",
+      "ramas": [
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Guía y vínculo de descarga del ZIP de demostración React/Bootstrap: Java 17, extracción completa, iniciadores Windows/macOS/Linux, puerto 8090 y base H2 persistida en datos/. Aclara que esta rama solo añade distribución sobre React. Exclusivo de la rama demo."
+    },
+    {
+      "ruta": "distribucion/SHA256SUMS.txt",
+      "ramas": [
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Checksum SHA-256 del archivo Tamizaje-bootstrap.zip: 4d3796093878f61d8973045896e35d844cdada96fe2918367ac1c8f430592f9f. Permite comprobar que la descarga coincide byte por byte con la versión documentada. Exclusivo de demo."
+    },
+    {
+      "ruta": "distribucion/Tamizaje-bootstrap.zip",
+      "ramas": [
+        "D"
+      ],
+      "tipo": "distribución binaria",
+      "responsabilidad": "Paquete binario de prueba de 39.140.363 bytes. Contiene cuatro archivos bajo Tamizaje/: iniciar.sh, iniciar.cmd, LEEME.txt y tamizaje-demo.jar; el JAR incluye frontend React compilado, API y H2 2.1.214. Guarda datos fuera del ZIP, en datos/ al ejecutarlo. Es una instantánea React y no contiene el asistente Vue actual. Exclusivo de demo."
+    },
+    {
+      "ruta": "docs/Tamizaje-documentacion-integral.pdf",
+      "ramas": [
+        "V (documentación nueva)"
+      ],
+      "tipo": "documentación",
+      "responsabilidad": "Versión distribuible del manual, con texto seleccionable, índice con vínculos, marcadores, tablas y numeración de páginas. No ejecuta la aplicación."
+    },
+    {
+      "ruta": "docs/documentacion-integral.md",
+      "ramas": [
+        "V (documentación nueva)"
+      ],
+      "tipo": "documentación",
+      "responsabilidad": "Fuente editable del manual: funcionamiento, ramas, arquitectura, operación, API, inventario por archivo y anexos. Es la entrada de generar_pdf.py."
+    },
+    {
+      "ruta": "docs/documentacion.css",
+      "ramas": [
+        "V (documentación nueva)"
+      ],
+      "tipo": "documentación",
+      "responsabilidad": "Presentación del manual: portada, colores, tablas, bloques de código, saltos de página, índice y márgenes/pies A4. No afecta el CSS de la aplicación."
+    },
+    {
+      "ruta": "docs/generar_pdf.py",
+      "ramas": [
+        "V (documentación nueva)"
+      ],
+      "tipo": "documentación",
+      "responsabilidad": "Generador reproducible: convierte el Markdown mediante Pandoc, aplica documentacion.css y usa Chromium/Chrome para exportar el PDF, sin arrancar Spring Boot ni modificar datos."
+    },
+    {
+      "ruta": "docs/inventario-archivos.json",
+      "ramas": [
+        "V (documentación nueva)"
+      ],
+      "tipo": "documentación",
+      "responsabilidad": "Inventario legible por herramientas: ramas y commits auditados, ruta y responsabilidad de cada archivo, pertenencia por rama y tipo de archivo. Complementa el catálogo del PDF."
+    },
+    {
+      "ruta": "frontend/.gitignore",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Excluye node_modules/, dist/ y .env.local del control de versiones del frontend React. El código fuente y package-lock.json sí se conservan. Presente en ramas React y demo."
+    },
+    {
+      "ruta": "frontend/README.md",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Guía de la variante React con Bootstrap: pantallas, Node.js requerido, instalación npm ci, desarrollo en puerto 5173, proxy hacia Spring Boot, pruebas y build, más restricciones del backend. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/index.html",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Documento HTML inicial de Vite, en español, con metadatos y contenedor #root. Carga /src/main.jsx como módulo; no contiene la aplicación completa. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/package-lock.json",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Bloquea las versiones exactas y la integridad del árbol npm para que npm ci reproduzca la instalación. Resuelve React/React DOM 19.3.0, Bootstrap 5.3.8, React-Bootstrap 2.10.10, Vite 7.3.7 y Vitest 3.2.7. No es un archivo para escribir lógica de negocio. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/package.json",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Define el proyecto privado ECMAScript tamizaje-frontend 1.0.0, scripts dev/build/preview/test y rangos de versiones para React, React DOM, Bootstrap, React-Bootstrap, Lucide, Vite, Vitest, jsdom y Testing Library. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/src/App.jsx",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Aplicación React en un archivo: componentes Field, Form, Badge, StatCard y Empty; estado y navegación de App; resumen, búsqueda y tablas de pacientes, enfermeros y tamizajes; modales de alta; ficha Detail con antropometría, tomas de presión, cuestionario, resultado FINDRISC e impresión. Cada alta o control usa una petición separada: no implementa el asistente ni el guardado integral atómico de la rama Vue. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/src/App.test.jsx",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Cinco pruebas Vitest con Testing Library y fetch simulado: recuperar cuestionario al reabrir ficha, bloquear presión invertida sin POST, mostrar error de conexión con reintento, registrar paciente y cerrar modal, y Escape con restauración de foco. No utiliza una base real. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/src/api.js",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Cliente fetch de /api del mismo origen. Codifica parámetros o envía JSON, interpreta respuestas JSON/texto y conserva mensajes HTTP de error. Incluye label para etiquetas, age para edad y questionnaire para normalizar booleanos y antecedentes antes del envío. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/src/api.test.js",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Cinco pruebas Vitest del contrato del cliente: parámetros codificados al crear paciente, preservación del mensaje de error, conversión de booleanos y limpieza de antecedentes, mantenimiento de antecedentes elegidos y cálculo de edad con reloj simulado. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/src/main.jsx",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Punto de entrada React: importa React y createRoot, Bootstrap CSS y luego los estilos propios; monta App dentro de React.StrictMode en #root. Usa React-Bootstrap para componentes interactivos, sin cargar el bundle JavaScript de Bootstrap por separado. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/src/styles.css",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Personaliza variables de Bootstrap y apariencia sanitaria verde; sidebar, cabecera, tarjetas, formularios, listados, fichas y modales. Incluye adaptación móvil y reglas @media print para imprimir el resultado sin navegación ni formularios. Presente en React y demo."
+    },
+    {
+      "ruta": "frontend/vite.config.js",
+      "ramas": [
+        "R",
+        "D"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Activa @vitejs/plugin-react, fija desarrollo en puerto 5173 con strictPort y proxy /api hacia API_TARGET o http://127.0.0.1:8080; configura Vitest con jsdom. El proxy pertenece al servidor de desarrollo, no al build de producción. Presente en React y demo."
+    },
+    {
+      "ruta": "gradle/wrapper/gradle-wrapper.jar",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "distribución binaria",
+      "responsabilidad": "Binario oficial del wrapper que descarga y arranca la versión de Gradle indicada por sus propiedades; no contiene lógica de negocio."
+    },
+    {
+      "ruta": "gradle/wrapper/gradle-wrapper.properties",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Fija distribución Gradle 7.6.4 y parámetros de descarga/almacenamiento del wrapper para una compilación reproducible."
+    },
+    {
+      "ruta": "gradlew",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Script de arranque del wrapper Gradle para sistemas Unix; permite ejecutar bootRun, test y bootJar con la versión fijada."
+    },
+    {
+      "ruta": "gradlew.bat",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Script de arranque del wrapper Gradle para Windows; permite ejecutar las mismas tareas desde CMD/PowerShell."
+    },
+    {
+      "ruta": "settings.gradle",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Asigna al proyecto Gradle el nombre tamizaje."
+    },
+    {
+      "ruta": "src/main/java/cent35/TamizajeApplication.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Punto de entrada de Spring Boot; inicia el servidor y el escaneo del paquete cent35. Declara un CommandLineRunner vacío, sin carga de datos iniciales."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/AntropometriaController.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Publica GET/POST /api/tamizajes/{id}/antropometria. Busca la ficha, exige consentimiento al crear, valida peso/talla, guarda con AntropometriaRepository y devuelve AntropometriaDTO."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/CuestionarioController.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Controlador REST de cuestionarios. En main/work proporciona las operaciones originales de alta y consulta por control; no ofrece GET por ficha. Las ramas React/demo y Vue agregan GET /api/tamizajes/{idTamizaje}/cuestionario para recuperar el cuestionario vinculado, devolver su DTO o 404 si falta la ficha/cuestionario. La interfaz lo usa al reabrir una atención para evitar altas duplicadas."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/EnfermeroController.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Publica listado, consulta por ID y alta individual de enfermeros; el POST recibe parámetros nombre/apellido/rol/turno, persiste Enfermero y consulta mediante EnfermeroDTO."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/PacienteController.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Publica listado y alta individual de pacientes; el POST recibe fecha_nacimiento y sexo como parámetros, agrega fecha de registro y guarda con PacienteRepository. Este alta individual no llama a Paciente.validar."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/ResultadoTamizajeController.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Publica GET/POST /api/tamizajes/{id}/resultado. Valida consentimiento y controles, reutiliza el resultado existente, delega el cálculo a ResultadoTamizajeService y devuelve ResultadosTamizajeDTO."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/TamizajeCompletoController.java",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Publica POST /api/tamizajes/completo para el asistente. Delega en el servicio transaccional, convierte errores previstos a HTTP y reconoce códigos duplicados tras una reversión por integridad."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/TamizajeController.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Publica listado, consulta y creación individual de fichas. Exige consentimiento/código único al crear y devuelve TamizajeDTO resumido en las consultas."
+    },
+    {
+      "ruta": "src/main/java/cent35/controllers/TomaPresionController.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Publica listado de tomas por ficha y GET/POST/PUT/DELETE de presión. Valida sistólica/diastólica, asigna número por conteo + 1 al crear y devuelve TomaPresionDTO."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/AntropometriaDTO.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Proyección JSON de una antropometría: idControl, pesoKg, tallacm, cinturacm e imc calculado. Evita devolver el vínculo JPA inverso al tamizaje."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/CuestionarioDTO.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Proyección JSON de cuestionario: ID, tres respuestas booleanas, tabaquismo, grado familiar y copia de tipos de antecedentes; excluye la referencia inversa a la ficha."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/EnfermeroDTO.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Proyección JSON de enfermero con ID, nombre, apellido, rol y turno. No serializa sus colecciones de fichas operadas/supervisadas."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/PacienteDTO.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Proyección JSON de paciente con id_paciente, fecha_nacimiento, sexo y fecha_registro. No serializa la colección de tamizajes."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/ResultadosTamizajeDTO.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Respuesta JSON del resultado: ID, puntaje/categoría FINDRISC, riesgo cardiovascular simplificado, semáforos, derivaciones y observaciones; usa nombres camelCase y excluye semáforo de cintura."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/TamizajeCompletoDTO.java",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Agrupa la respuesta del alta atómica: DTO de ficha, paciente, operador, antropometría, primera presión, cuestionario y resultado; no incluye un bloque de supervisor."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/TamizajeCompletoRequest.java",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Contrato JSON de entrada del alta completa. Define clases anidadas para personas/controles, identificadores alternativos para reutilizar personas y supervisor opcional; el servicio valida la exclusividad."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/TamizajeDTO.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Proyección resumida de ficha con id, consent, timestamp e id_registro. No expone IDs de personas ni los controles relacionados."
+    },
+    {
+      "ruta": "src/main/java/cent35/dtos/TomaPresionDTO.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Proyección JSON de presión con idControl, numeroToma, sistolicaMmHg y diastolicaMmHg; excluye la referencia a Tamizaje."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/Antropometria.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad JPA que extiende Control; almacena peso, talla y cintura, valida peso 30–300/talla 120–220, calcula IMC y se vincula uno a uno a Tamizaje."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/Control.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad abstracta base de antropometría, cuestionario y presión; define idControl e implementa herencia JPA JOINED con un método validar por defecto."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/Cuestionario.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad de respuestas que extiende Control. Persiste enums y lista de tipos con ElementCollection, exige respuestas y tipos ante antecedentes familiares y se vincula uno a uno a la ficha."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/Enfermero.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad de personal con nombre, apellido, rol, turno y colecciones inversas de tamizajes operados y supervisados. Los roles son datos, no autenticación."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/Paciente.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad de paciente con nacimiento, sexo y fecha de alta; calcula edad respecto de LocalDate.now(), valida edad 14–120 y mantiene la relación con sus tamizajes."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/ResultadosTamizaje.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad de resultado uno a uno; almacena puntajes, categorías, semáforos y derivaciones, y ofrece ayudantes de observaciones/derivación. Su ayudante de semáforo no es el llamado por el servicio principal, que usa Tamizaje."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/Tamizaje.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad central de atención con código único, consentimiento, fecha y relaciones a personas/controles/resultado. Mantiene vínculos bidireccionales y reglas de IMC, presión, riesgo cardiovascular simplificado y semáforo global."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/TomaPresion.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Entidad de presión que extiende Control; guarda número de toma, sistólica y diastólica, valida rangos 70–260/40–150 y sistólica>diastólica, y se vincula muchos a uno con Tamizaje."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/enums/AntecedentesFamiliares.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Enum NO/SEGUNDO_GRADO/PRIMER_GRADO, con descripciones de parentesco. Se usa en cuestionario y puntaje FINDRISC."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/enums/RolEnfermero.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Enum ENFERMERO/SUPERVISOR para distinguir operador y supervisor en validaciones del alta completa."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/enums/SemaforoGlobal.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Enum VERDE/AMARILLO/ROJO para persistir y publicar la clasificación global de una atención."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/enums/Sexo.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Enum M/F/O para el sexo registrado del paciente. Se persiste como texto y se acepta en peticiones JSON/parámetros."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/enums/Tabaquismo.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Enum NUNCA/EX/ACTUAL; ACTUAL suma un factor al riesgo cardiovascular simplificado."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/enums/TipoAntecedente.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Enum DIABETES/HIPERTENSION/ENFERMEDAD_CARDIOVASCULAR/OTRO para tipos de antecedentes; el antecedente cardiovascular activa semáforo cardiovascular rojo."
+    },
+    {
+      "ruta": "src/main/java/cent35/models/enums/Turnos.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Enum MAÑANA/TARDE/VESPERTINO para el turno del personal. La Ñ forma parte del valor de API."
+    },
+    {
+      "ruta": "src/main/java/cent35/repositories/AntropometriaRepository.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "JpaRepository<Antropometria, Long> con CRUD persistente; marcado RepositoryRestResource para exportación automática de Spring Data REST."
+    },
+    {
+      "ruta": "src/main/java/cent35/repositories/CuestionarioRepository.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "JpaRepository<Cuestionario, Long> usado para listas, búsqueda y alta de cuestionarios; también exportable mediante Spring Data REST."
+    },
+    {
+      "ruta": "src/main/java/cent35/repositories/EnfermeroRepository.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "JpaRepository<Enfermero, Integer> usado para altas, listados y resolución de operador/supervisor; también exportable mediante Spring Data REST."
+    },
+    {
+      "ruta": "src/main/java/cent35/repositories/PacienteRepository.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "JpaRepository<Paciente, Integer> usado para altas, listas y reutilización de pacientes; también exportable mediante Spring Data REST."
+    },
+    {
+      "ruta": "src/main/java/cent35/repositories/ResultadosTamizajeRepository.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "JpaRepository<ResultadosTamizaje, Long>; agrega findByTamizajeId para recuperar o reutilizar el resultado único de una ficha. Exportable por Data REST."
+    },
+    {
+      "ruta": "src/main/java/cent35/repositories/TamizajeRepository.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "JpaRepository<Tamizaje, Long>; agrega consulta JPQL existsByIdRegistro sobre el campo id_registro para prevenir duplicados, además de saveAndFlush del alta atómica. Exportable por Data REST."
+    },
+    {
+      "ruta": "src/main/java/cent35/repositories/TomaPresionRepository.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "JpaRepository<TomaPresion, Long>; agrega listado por ficha ordenado por numeroToma y conteo para numerar nuevas tomas. Exportable por Data REST."
+    },
+    {
+      "ruta": "src/main/java/cent35/services/FindriscService.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Calcula el puntaje FINDRISC disponible por edad, IMC, actividad, frutas/verduras, medicación y parentesco; omite cintura/glucemia previa y clasifica categorías, con máximo actual 17."
+    },
+    {
+      "ruta": "src/main/java/cent35/services/ResultadoTamizajeService.java",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Centraliza el cálculo compartido del alta y recálculo: combina FindriscService con reglas de Tamizaje, actualiza semáforos/derivaciones/observaciones y vincula el resultado."
+    },
+    {
+      "ruta": "src/main/java/cent35/services/TamizajeCompletoService.java",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Coordina el alta completa en una transacción: valida y resuelve personas, construye controles, calcula antes de escribir y persiste el grafo con rollback si falla; devuelve TamizajeCompletoDTO."
+    },
+    {
+      "ruta": "src/main/resources/application-demo.properties",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Perfil local demo: escucha 127.0.0.1, H2 en archivo .tamizaje-demo/tamizaje con compatibilidad MySQL, dialecto H2, actualización de esquema y consola H2 desactivada."
+    },
+    {
+      "ruta": "src/main/resources/application.properties",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Configuración base: puerto 8080, nombre 2026, conexión MySQL local 3307/tamizaje con root, driver/dialecto MySQL8 y esquema Hibernate ddl-auto=update."
+    },
+    {
+      "ruta": "src/main/resources/static/css/app.css",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Estilos propios sobre Bootstrap: identidad visual, menú, tarjetas, formularios y validaciones, navegación del asistente, revisión e informes; adapta la vista a móviles y oculta controles al imprimir, conservando datos y advertencias del resultado."
+    },
+    {
+      "ruta": "src/main/resources/static/index.html",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Página de entrada y plantilla Vue en español: estructura Bootstrap, navegación, asistente de siete pasos, revisión, informe, listados, fichas con pestañas, modales y atributos de accesibilidad. Importa recursos locales y monta la raíz #app."
+    },
+    {
+      "ruta": "src/main/resources/static/js/api.js",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Cliente HTTP del mismo origen con prefijo /api: JSON, parámetros, respuestas vacías, errores de servidor, red y cancelación; trata 404 opcionales. Provee formatos, edades y etiquetas, validadores de persona/controles/cuestionario, validación por paso y construcción del DTO de alta completa sin modificar el borrador."
+    },
+    {
+      "ruta": "src/main/resources/static/js/app.js",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Aplicación Vue con Composition API: estado reactivo, carga y búsqueda de listados, navegación por fragmentos, borrador y avance de los siete pasos, guardado atómico mediante un POST, informes, modales de personas, consulta de fichas, cambios de presión y recálculo/impresión."
+    },
+    {
+      "ruta": "src/main/resources/static/vendor/bootstrap/LICENSE",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "biblioteca de terceros",
+      "responsabilidad": "Licencia MIT de Bootstrap que acompaña los archivos CSS y JavaScript incluidos en el repositorio."
+    },
+    {
+      "ruta": "src/main/resources/static/vendor/bootstrap/bootstrap.bundle.min.js",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "biblioteca de terceros",
+      "responsabilidad": "Distribución JavaScript local de Bootstrap 5.3.8 con dependencias incluidas. Expone bootstrap.Modal, sus eventos, gestión de apertura/cierre y el comportamiento interactivo de los componentes Bootstrap."
+    },
+    {
+      "ruta": "src/main/resources/static/vendor/bootstrap/bootstrap.min.css",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "biblioteca de terceros",
+      "responsabilidad": "Hoja oficial minificada Bootstrap 5.3.8: grilla, formularios, botones, tablas, alertas, tarjetas, navegación y utilidades utilizadas por la plantilla. app.css se carga después para personalizarla."
+    },
+    {
+      "ruta": "src/main/resources/static/vendor/versions.json",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "biblioteca de terceros",
+      "responsabilidad": "Manifiesto de procedencia y versiones fijadas de Vue y Bootstrap: URLs de paquetes, integridad npm de Vue y hashes SHA-256 de los archivos y licencias distribuidos. Permite verificar exactamente qué bibliotecas locales se incluyeron."
+    },
+    {
+      "ruta": "src/main/resources/static/vendor/vue/LICENSE",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "biblioteca de terceros",
+      "responsabilidad": "Licencia MIT de Vue distribuida junto a su biblioteca. Conserva las condiciones y atribuciones aplicables al código de terceros."
+    },
+    {
+      "ruta": "src/main/resources/static/vendor/vue/vue.esm-browser.prod.js",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "biblioteca de terceros",
+      "responsabilidad": "Distribución local de producción Vue 3.5.44 en módulo ES para navegador, con compilador de plantillas. Proporciona createApp, ref, reactive, computed, watch y demás funciones importadas por app.js; evita depender de CDN o de compilación npm."
+    },
+    {
+      "ruta": "src/test/java/cent35/TamizajeCompletoIntegrationTests.java",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Integración MockMvc y base H2 en memoria del POST /api/tamizajes/completo: 28 ejecuciones contando parámetros. Verifica grafo completo y cintura, resultado equivalente al recálculo, reutilización/supervisor, duplicados y carrera con restricción única, validaciones, consentimiento, roles/personas ausentes y rollback por fallo del cálculo."
+    },
+    {
+      "ruta": "src/test/java/cent35/WebUiIntegrationTests.java",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Integración Spring Boot/MockMvc con perfil demo y H2 en memoria: 9 ejecuciones contando casos parametrizados de raíz index.html, Vue y Bootstrap locales, tipos de contenido, lectura API del mismo origen y 404 de cuestionario para ficha inexistente."
+    },
+    {
+      "ruta": "src/test/java/com/example/tamizaje/TamizajeApplicationTests.java",
+      "ramas": [
+        "M",
+        "R",
+        "D",
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "Prueba original de arranque del contexto Spring con la clase cent35.TamizajeApplication. No selecciona perfil demo ni reemplaza datasource, por lo que usa la configuración por defecto y puede necesitar MySQL."
+    },
+    {
+      "ruta": "src/test/js/api.test.mjs",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "13 pruebas con node:test del cliente HTTP y utilidades: codificación de parámetros, conservación de false, DELETE vacío, errores HTTP/red/cancelación, 404 opcional, cuestionario y antecedentes, presión, fechas/edad, paciente, antropometría y formatos/colores."
+    },
+    {
+      "ruta": "src/test/js/direct-form.test.mjs",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "10 pruebas del constructor del alta completa: DTO exacto, personas nuevas o existentes y combinaciones, ID válidos, consentimiento/código/nombres/turno, edad/sexo, medidas/presión/respuestas y ausencia de mutaciones o referencias compartidas con el borrador."
+    },
+    {
+      "ruta": "src/test/js/wizard-form.test.mjs",
+      "ramas": [
+        "V"
+      ],
+      "tipo": "fuente, prueba o configuración",
+      "responsabilidad": "11 pruebas de validateDirectRegistrationStep: admite borradores parciales, valida sólo el paso visible, contempla personas existentes, exige cintura en asistente y antecedentes condicionales, revalida toda la revisión y rechaza índices inválidos sin mutar el borrador."
+    }
+  ]
+}
